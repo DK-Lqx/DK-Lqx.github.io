@@ -1,0 +1,494 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/browser_tab.jpeg">
+  <link rel="icon" href="/img/browser_tab.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="大二暑假学习深空后期处理时总结的简易笔记，之后有空了再完善">
+  <meta name="author" content="lqx">
+  <meta name="keywords" content="">
+  <meta name="description" content="大二暑假学习深空后期处理时总结的简易笔记，之后有空了再完善">
+<meta property="og:type" content="article">
+<meta property="og:title" content="我的深空摄影后期处理流程">
+<meta property="og:url" content="http://example.com/2021/12/04/%E6%B7%B1%E7%A9%BA%E5%90%8E%E6%9C%9F%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B/index.html">
+<meta property="og:site_name" content="Robotics and Astronomy by lqx">
+<meta property="og:description" content="大二暑假学习深空后期处理时总结的简易笔记，之后有空了再完善">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-12-04T12:23:19.876Z">
+<meta property="article:modified_time" content="2021-12-10T15:40:46.302Z">
+<meta property="article:author" content="lqx">
+<meta property="article:tag" content="Astronomy">
+<meta name="twitter:card" content="summary_large_image">
+  
+  <title>我的深空摄影后期处理流程 - Robotics and Astronomy by lqx</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.12","typing":{"enable":false,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>DK-L</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/deepsky/M20.jpeg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="我的深空摄影后期处理流程">
+              
+                我的深空摄影后期处理流程
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-12-04 20:23" pubdate>
+        December 4, 2021 pm
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      2.2k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      7 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">我的深空摄影后期处理流程</h1>
+            
+            <div class="markdown-body">
+              <h2 id="1-预处理"><a href="#1-预处理" class="headerlink" title="1 预处理"></a>1 预处理</h2><h3 id="1-1-校准："><a href="#1-1-校准：" class="headerlink" title="1.1 校准："></a>1.1 校准：</h3><h3 id="1-2-转色："><a href="#1-2-转色：" class="headerlink" title="1.2 转色："></a>1.2 转色：</h3><p>PI1.8：Debayer ，Bayer Pattern根据使用相机的具体型号选择，QHY8L是GBRG。Demosaicing method选择VNG，Target Images选择要转色的照片，Output Files选择输出照片的保存路径，建议新建一个文件夹debayer存放转色后的图像。</p>
+<h3 id="1-3-对齐："><a href="#1-3-对齐：" class="headerlink" title="1.3 对齐："></a>1.3 对齐：</h3><p>PI1.8：StarAlignment，类似的操作，选择参考图像，要对齐的图像，输出文件路径。Interpolation选择Auto即可。</p>
+<h3 id="1-4-叠加："><a href="#1-4-叠加：" class="headerlink" title="1.4 叠加："></a>1.4 叠加：</h3><p>PI1.8：ImageIntegration，Add Files导入要叠加的对齐过后的图像，Pixel Rejection中拒绝算法可以选择Sigma Clipping(均值降噪时自动剔除偏差较大的点)。</p>
+<h2 id="2-线性处理"><a href="#2-线性处理" class="headerlink" title="2 线性处理"></a>2 线性处理</h2><h3 id="2-1-STF拉伸预览："><a href="#2-1-STF拉伸预览：" class="headerlink" title="2.1 STF拉伸预览："></a>2.1 STF拉伸预览：</h3><p>PI1.8：ScreenTransferFunction，点击左下角核武器图标自动拉伸，右下角电视图标选择是否预览，直接将左下角三角形图标拖到HT栏下部可直接生成对应的HT拉伸。之后直接将HT页面左下角的小三角拖到图像上就可直接将效果应用到图像上。</p>
+<h3 id="2-2-动态剪裁："><a href="#2-2-动态剪裁：" class="headerlink" title="2.2 动态剪裁："></a>2.2 动态剪裁：</h3><p>PI1.8：DynamicCrop，剪裁后应用即可。</p>
+<h3 id="2-3-DBE："><a href="#2-3-DBE：" class="headerlink" title="2.3 DBE："></a>2.3 DBE：</h3><p>PI1.8：DynamicBackgroundExtraction，第一步利用十字选择过渡区域时可以用HT做辅助拉伸看北京明暗过渡交界，第二步选择背景点时注意均匀选取，注意在Target Image Correction中的Correction选择Subtraction。</p>
+<h3 id="2-4-背景色彩平衡："><a href="#2-4-背景色彩平衡：" class="headerlink" title="2.4 背景色彩平衡："></a>2.4 背景色彩平衡：</h3><p>PI1.8：BackgroundNeutralization，默认参数直接应用。Reference Image选择划定的Preview的背景区域，可以用Upper limit来排除背景区域中较亮恒星的干扰(最大值和最小值的确定可以用鼠标在背景区域中扫描，然后在底部看RGB对应的值，选择一个大概的值即可，不必太过纠结)。</p>
+<h3 id="2-5-色彩校准："><a href="#2-5-色彩校准：" class="headerlink" title="2.5 色彩校准："></a>2.5 色彩校准：</h3><p>PI1.8：ColorCalibration，一般来说Structure Detection就能取得不错的效果；如果不行，先分别选出星云和背景的区域，在White Reference中的Reference Image中选择星云在的区域，在Background Reference中的Reference Image中选择背景在的区域，之后应用；如果还不行，使用Manual White Balence手动调节，注意一次成型，不行就撤回重来。</p>
+<h3 id="2-6-线性降噪："><a href="#2-6-线性降噪：" class="headerlink" title="2.6 线性降噪："></a>2.6 线性降噪：</h3><p>PI1.8：ATrousWaveletTransform，利用小波变换降噪，不同层在Noise Reduction中选择不同的降噪参数，比如说Scale分别为1,2,4,8时参数分别为(3,0.25,2),(2,0.25,2),(1,0.25,2),(0.5,0.12,2)。</p>
+<h3 id="2-6-反卷积："><a href="#2-6-反卷积：" class="headerlink" title="2.6 反卷积："></a>2.6 反卷积：</h3><p>PI1.8:Deconvolution，我入门看的视频中这一步是在HT拉伸后做的，效果也不错。先调整参数建立星点模型，找一颗星星数像素数，模型的像素数应该和它差不多，方向和图像中大部分星星的变形拉伸方向垂直即可。之后利用StarMask建立星点蒙版(Smoothness可以选择的小一些，6左右)，可以HT增强星点蒙版对比度，然后在Convolution做高斯模糊。之后建立明度蒙版(整体页面左上角加号图标右边的图标)并应用(关于蒙版的三个图标在整个页面的右上角)，反卷积只对较亮的主体星云作用。之后开启Deringing，其中的Local Support选择刚刚建立的星点蒙版。如果效果过于严重，可以减少迭代次数并将Deringing中的Global dark值调高(一般在0.03-0.1之间)</p>
+<h2 id="3-非线性处理"><a href="#3-非线性处理" class="headerlink" title="3 非线性处理"></a>3 非线性处理</h2><h3 id="3-1-直方图拉伸："><a href="#3-1-直方图拉伸：" class="headerlink" title="3.1 直方图拉伸："></a>3.1 直方图拉伸：</h3><p>PI1.8:HistogramTransfermation，可以把STF中的效果拖过来直接应用。调节时注意点击左下角的小圆点开启实时预览。</p>
+<h3 id="3-2-非线性降噪："><a href="#3-2-非线性降噪：" class="headerlink" title="3.2 非线性降噪："></a>3.2 非线性降噪：</h3><p>PI1.8:ACDNR，默认参数即可，注意套着明度蒙版做，只对背景降噪，蒙版做的稍微柔和一些。</p>
+<h3 id="3-3-LHE增强对比度："><a href="#3-3-LHE增强对比度：" class="headerlink" title="3.3 LHE增强对比度："></a>3.3 LHE增强对比度：</h3><p>PI1.8：LocalHistogramEqualization，效果过猛可以可以降低Amount，注意套着蒙版做，只对主体强化，蒙版做的稍微柔和一点，HT时只动左边的滑块。</p>
+<h3 id="3-4-饱和度调整："><a href="#3-4-饱和度调整：" class="headerlink" title="3.4 饱和度调整："></a>3.4 饱和度调整：</h3><p>PI1.8：CurvesTransformation&amp;ColorSaturation。CurvesTransformation中可以使用S曲线提升饱和度，也可以分别处理RGB三个通道的曲线。ColorSaturation可以通过拉曲线提升不同颜色的饱和度。调节时注意点击左下角的小圆点开启实时预览。注意套着明度蒙版做。</p>
+<h3 id="3-5-gamma增强-暗云气-："><a href="#3-5-gamma增强-暗云气-：" class="headerlink" title="3.5 gamma增强(暗云气)："></a>3.5 gamma增强(暗云气)：</h3><p>PI1.8：ExponentialTransformation。默认参数即可。</p>
+<h3 id="3-6-SCNR去绿："><a href="#3-6-SCNR去绿：" class="headerlink" title="3.6 SCNR去绿："></a>3.6 SCNR去绿：</h3><p>PI1.8：SCNR。默认参数即可。</p>
+<h3 id="3-7-缩星："><a href="#3-7-缩星：" class="headerlink" title="3.7 缩星："></a>3.7 缩星：</h3><p>PI1.8：StarMask&amp;MorphologicalTransformation。建立星点蒙版后应用MorphologicalTransformation。</p>
+<h2 id="4-导出"><a href="#4-导出" class="headerlink" title="4 导出"></a>4 导出</h2><p>注意导出时如果后面还要在PS中处理，TIFF选择位深度为16位的int</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Astronomy/">Astronomy</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/12/04/%E5%9B%9B%E6%97%8B%E7%BF%BC%E9%A3%9E%E6%8E%A7%E6%95%B4%E4%BD%93%E6%A1%86%E6%9E%B6%E4%BB%8B%E7%BB%8D/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">四旋翼飞控整体框架介绍：建模、状态估计和控制</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/12/04/%E5%90%84%E7%A7%8D%E5%A7%BF%E6%80%81%E8%A7%A3%E7%AE%97%E6%96%B9%E6%B3%95%E7%9A%84%E6%AF%94%E8%BE%83/">
+                        <span class="hidden-mobile">IMU各种姿态解算方法的实现与比较</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;TOC</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        loader: {
+          load: ['ui/lazy']
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

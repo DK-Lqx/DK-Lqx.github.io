@@ -1,0 +1,599 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/browser_tab.jpeg">
+  <link rel="icon" href="/img/browser_tab.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="在暑假学习四旋翼飞控与IMU姿态解算的过程中，为了更好的理解和掌握，自己实现了一些姿态解算算法，从头造了轮子哈哈">
+  <meta name="author" content="lqx">
+  <meta name="keywords" content="">
+  <meta name="description" content="在暑假学习四旋翼飞控与IMU姿态解算的过程中，为了更好的理解和掌握，自己实现了一些姿态解算算法，从头造了轮子哈哈">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IMU各种姿态解算方法的实现与比较">
+<meta property="og:url" content="http://example.com/2021/12/04/%E5%90%84%E7%A7%8D%E5%A7%BF%E6%80%81%E8%A7%A3%E7%AE%97%E6%96%B9%E6%B3%95%E7%9A%84%E6%AF%94%E8%BE%83/index.html">
+<meta property="og:site_name" content="Robotics and Astronomy by lqx">
+<meta property="og:description" content="在暑假学习四旋翼飞控与IMU姿态解算的过程中，为了更好的理解和掌握，自己实现了一些姿态解算算法，从头造了轮子哈哈">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/img/IMU_solve/CF_Pitch.svg">
+<meta property="og:image" content="http://example.com/img/IMU_solve/CF_Roll.svg">
+<meta property="og:image" content="http://example.com/img/IMU_solve/CF_Yaw.svg">
+<meta property="og:image" content="http://example.com/img/IMU_solve/CF_Compare.svg">
+<meta property="og:image" content="http://example.com/img/IMU_solve/MH_Pitch.svg">
+<meta property="og:image" content="http://example.com/img/IMU_solve/MH_Roll.svg">
+<meta property="og:image" content="http://example.com/img/IMU_solve/MH_Yaw.svg">
+<meta property="article:published_time" content="2021-12-04T11:30:56.823Z">
+<meta property="article:modified_time" content="2021-12-10T05:54:45.578Z">
+<meta property="article:author" content="lqx">
+<meta property="article:tag" content="IMU">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/IMU_solve/CF_Pitch.svg">
+  
+  <title>IMU各种姿态解算方法的实现与比较 - Robotics and Astronomy by lqx</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.12","typing":{"enable":false,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>DK-L</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/IMU_solve/Eular%20Angle.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="IMU各种姿态解算方法的实现与比较">
+              
+                IMU各种姿态解算方法的实现与比较
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-12-04 19:30" pubdate>
+        December 4, 2021 pm
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      15k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      45 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">IMU各种姿态解算方法的实现与比较</h1>
+            
+            <div class="markdown-body">
+              <h2 id="1-基本知识：旋转表示法"><a href="#1-基本知识：旋转表示法" class="headerlink" title="1 基本知识：旋转表示法"></a>1 基本知识：旋转表示法</h2><h3 id="1-1-坐标系："><a href="#1-1-坐标系：" class="headerlink" title="1.1 坐标系："></a>1.1 坐标系：</h3><p>在姿态解算问题中，我们一般会用到两个坐标系：机体坐标系<script type="math/tex">o_bx_by_bz_b</script>和地球固连坐标系<script type="math/tex">o_ex_ey_ez_e</script>。同一个向量<script type="math/tex">r</script>在两种坐标系下可能有不同的表示，一般我们记向量<script type="math/tex">r</script>在机体坐标系下的表示为<script type="math/tex">^{b}r</script>，在地球固连坐标系下的表示为<script type="math/tex">^{e}r</script>。旋转表示法解决的主要问题就是：同一个向量在两种坐标系下的表示有什么联系，我们怎样由其中的一中表示推出另外一种表示。</p>
+<h3 id="1-2-欧拉角："><a href="#1-2-欧拉角：" class="headerlink" title="1.2 欧拉角："></a>1.2 欧拉角：</h3><p>欧拉角是最直观的一种的旋转表示法，但是由于其使用三个参数来表示三个自由度的旋转，不可避免的会出现奇异性问题，即通常所说的“万向节死锁”，在俯仰角或滚转角接近90°时出现自由度退化的问题。</p>
+<p>本文统一采用<script type="math/tex">z-y-x</script>欧拉角，俯仰角Pitch、滚转角Roll、偏航角Yaw分别记做<script type="math/tex">\theta、\phi、\psi</script>，​在地球固连坐标系旋转至机体坐标系的过程中，先沿地球固连坐标系的<script type="math/tex">z</script>轴旋转偏航角<script type="math/tex">\psi</script>，在沿新得到的临时机体坐标系的<script type="math/tex">y</script>轴旋转俯仰角<script type="math/tex">\theta</script>，最后沿第二次新得到的临时机体坐标系的<script type="math/tex">x</script>轴旋转滚转角<script type="math/tex">\phi</script>，最后得到机体坐标系。</p>
+<p>最终的姿态解算结果以及控制器的设计大部分是基于欧拉角进行的，之后会给出如何由旋转矩阵和四元数得到欧拉角。</p>
+<p>由上述的旋转过程和欧拉角的定义可以得到三个欧拉角的变化率和机体角速度的关系：$$\begin{pmatrix}\omega_{xb}\\\omega_{yb} \\\omega_{zb}\end{pmatrix} = \begin{pmatrix}1& 0 &-sin\theta \\0&cos\phi  &cos\theta sin\phi \\0 & -sin\phi &cos\theta cos\phi\end{pmatrix}\begin{pmatrix}\dot{\phi}\\\dot{\theta} \\\dot{\psi}\end{pmatrix}$$</p>
+<p>反之，有：$$\begin{pmatrix}\dot{\phi}\\\dot{\theta} \\\dot{\psi}\end{pmatrix} = \begin{pmatrix}1& tan\theta sin\phi &tan\theta cos\phi\\0&cos\phi  &-sin\phi \\0 & sin\phi / cos\theta&cos\phi /cos\theta\end{pmatrix}\begin{pmatrix}\omega_{xb}\\\omega_{yb} \\\omega_{zb}\end{pmatrix}$$        </p>
+<p>上面两个式子的意义在于，我们利用陀螺仪只能测出机体角速度在机体坐标系下的表示，即<script type="math/tex">\begin{pmatrix}\omega_{xb}&\omega_{yb} &\omega_{zb}\end{pmatrix}^T</script>，为了通过积分得到三个欧拉角，我们必须用上面的式子计算出三个欧拉角的变化率<script type="math/tex">\begin{pmatrix}\dot{\phi} & \dot{\theta} &\dot{\psi}\end{pmatrix}^T</script>，然后进行数值积分，计算出目前的欧拉角，即<script type="math/tex">\phi[n]=\phi[n-1]+\dot{\phi}\times \Delta t</script>，依次迭代，不断更新。</p>
+<h3 id="1-3-旋转矩阵："><a href="#1-3-旋转矩阵：" class="headerlink" title="1.3 旋转矩阵："></a>1.3 旋转矩阵：</h3><p>定义由坐标系1到坐标系2的旋转矩阵为<script type="math/tex">R_1^2</script>，使用方法为<script type="math/tex">^{2}r=R_1^{2}\ ^{1}r</script>，即将向量在坐标系1下的坐标表示转换为在坐标系2下的坐标表示。</p>
+<p>由上述欧拉角的旋转过程可以推出从机体坐标系到地球固连坐标系的旋转矩阵<script type="math/tex">R_b^e</script>为：$$R_b^e=\begin{pmatrix}cos\theta cos\phi & cos\psi sin\theta sin\phi-sin\psi cos\phi &cos\psi sin\theta cos\phi +sin\psi sin\phi \\ cos\theta sin\psi&sin\psi sin\theta sin\phi+cos\psi cos\phi  &sin\psi sin\theta cos\phi -cos\psi sin\phi \\-sin\theta & sin\phi  cos\theta&cos\phi cos\theta\end{pmatrix}$$   </p>
+<p>也可以由旋转矩阵求欧拉角，若记上述的旋转矩阵为：$$R_b^e=\begin{pmatrix}r_{11}&r_{12}&r_{13}\\r_{21}&r_{22}&r_{23}\\r_{31}&r_{32}&r_{33}\end{pmatrix}$$</p>
+<p>则有：</p>
+<ul>
+<li><p>偏航角   <script type="math/tex">\psi=arctan\frac{r_{21}}{r_{11}}</script></p>
+</li>
+<li><p>俯仰角   <script type="math/tex">\theta = arcsin(-r_{31})</script></p>
+</li>
+<li><p>滚转角   <script type="math/tex">\phi = arctan\frac{r_{32}}{r_{33}}</script></p>
+</li>
+</ul>
+<p>由旋转矩阵的正交性，从地球固连坐标系到机体坐标系的旋转矩阵<script type="math/tex">R_e^b</script>为：$$R_e^b=(R_b^e)^{-1}=(R_b^e)^T$$</p>
+<p>对旋转矩阵求逆只需要转置即可。</p>
+<p>不过也正是因为旋转矩阵的正交性带来了额外的约束，导致我们在利用非线性优化进行状态估计时出现了不必要的麻烦，所以我们一般利用接下来的四元数进行优化算法的设计。或者用更加高级的李群和李代数作为工具进行姿态估计，这也是SLAM中常用的做法，不过在四旋翼姿态解算中很少使用。</p>
+<p>旋转矩阵的导数为：$$\frac{d\boldsymbol{R}_b^e}{dt}=\boldsymbol{R}_b^e[^b\boldsymbol{\omega}]_{\times}$$</p>
+<p>展开为：$$\frac{d\boldsymbol{R}_b^e}{dt}=\boldsymbol{R}_b^e[^b\boldsymbol{\omega}]_{\times}=\begin{pmatrix}cos\theta cos\phi & cos\psi sin\theta sin\phi-sin\psi cos\phi &cos\psi sin\theta cos\phi +sin\psi sin\phi \\ cos\theta sin\psi&sin\psi sin\theta sin\phi+cos\psi cos\phi  &sin\psi sin\theta cos\phi -cos\psi sin\phi \\-sin\theta & sin\phi  cos\theta&cos\phi cos\theta\end{pmatrix}  \begin{pmatrix}0&-\omega_{zb}&\omega_{yb}\\\omega_{zb}&0& -\omega_{xb}\\-\omega_{yb}&\omega_{xb}&0\end{pmatrix}$$</p>
+<h3 id="1-4-四元数："><a href="#1-4-四元数：" class="headerlink" title="1.4 四元数："></a>1.4 四元数：</h3><p>单位四元数也可以用来表示旋转，具体理论在此不做过多介绍。</p>
+<p>假定地球固连坐标系到机体坐标系的旋转四元数为<script type="math/tex">\boldsymbol{q}_e^b=\begin{pmatrix}q_0 & q_1 &q_2&q_3\end{pmatrix}^T</script>，则有：$$\begin{pmatrix}0\\ ^{e}\boldsymbol{r}\end{pmatrix} =(\boldsymbol{q}_b^e)^{-1}\otimes \begin{pmatrix}0\\ ^{b}\boldsymbol{r}\end{pmatrix} \otimes\boldsymbol{q}_b^e =\boldsymbol{q}_e^b\otimes \begin{pmatrix}0\\ ^{b}\boldsymbol{r}\end{pmatrix} \otimes(\boldsymbol{q}_e^b)^{-1}$$</p>
+<p>由上式可得：                                       $$^{e}\boldsymbol{r}=\boldsymbol{C}(\boldsymbol{q}_e^b)\cdot \ ^{b}\boldsymbol{r}$$</p>
+<p>其中：         $$\boldsymbol{C}(\boldsymbol{q}_e^b)=\begin{pmatrix}q_0^2+q_1^2-q_2^2-q_3^2&2(q_1q_2-q_0q_3)&2(q_1q_3+q_0q_2)\\2(q_1q_2+q_0q_3)&q_0^2-q_1^2+q_2^2-q_3^2&2(q_2q_3-q_0q_1)\\2(q_1q_3-q_0q_2)&2(q_2q_3+q_0q_1)&q_0^2-q_1^2-q_2^2+q_3^2\end{pmatrix}$$</p>
+<p>上式可以看成是旋转矩阵的四元数表示，则根据由旋转矩阵求欧拉角的方法，可以得到由四元数求欧拉角的方法：</p>
+<ul>
+<li><p>偏航角   <script type="math/tex">\psi=arctan\frac{r_{21}}{r_{11}}=arctan\frac{2(q_1q_2+q_0q_3)}{q_0^2+q_1^2-q_2^2-q_3^2}</script></p>
+</li>
+<li><p>俯仰角   <script type="math/tex">\theta = arcsin(-r_{31})=arcsin(-2(q_1q_3-q_0q_2))</script></p>
+</li>
+<li><p>滚转角   <script type="math/tex">\phi = arctan\frac{r_{32}}{r_{33}}=arctan\frac{2(q_2q_3+q_0q_1)}{q_0^2-q_1^2-q_2^2+q_3^2}</script></p>
+</li>
+</ul>
+<p>在利用四元数进行优化时，四元数的导数是一个非常关键的信息，在迭代优化中起到非常重要的作用，幸运的是，四元数导数和机体角速度可以建立起关系：$$\dot{\boldsymbol{q}_e^b}=\frac{1}{2}\begin{pmatrix}0&-^{b}\boldsymbol{\omega}^T\\^{b}\boldsymbol{\omega}&-[^{b}\boldsymbol{\omega}]_{\times}\end{pmatrix}\boldsymbol{q}_e^b$$</p>
+<p>即：$$\dot{\boldsymbol{q}_e^b}=\frac{1}{2}\begin{pmatrix}0&-\omega_{xb}&-\omega_{yb}&-\omega_{zb} \\\omega_{xb}&0&\omega_{zb}&-\omega_{yb}\\\omega_{yb}&-\omega_{zb}&0& \omega_{xb}\\\omega_{zb}&\omega_{yb}&-\omega_{xb}&0\end{pmatrix}\begin{pmatrix}q_0 \\ q_1 \\q_2\\q_3\end{pmatrix}$$</p>
+<p>在Mahony姿态解算算法中，就是在修正过陀螺仪得到的机体角速度之后，利用上式计算四元数导数，以修正当前的四元数，不断迭代估计当前姿态。</p>
+<h2 id="2-测量模型：加速度计、陀螺仪、磁力计"><a href="#2-测量模型：加速度计、陀螺仪、磁力计" class="headerlink" title="2 测量模型：加速度计、陀螺仪、磁力计"></a>2 测量模型：加速度计、陀螺仪、磁力计</h2><h3 id="2-1-加速度计："><a href="#2-1-加速度计：" class="headerlink" title="2.1 加速度计："></a>2.1 加速度计：</h3><p>利用加速度计可以测量机体的俯仰角和滚转角，若记<script type="math/tex">^{b}\boldsymbol{a}=\begin{pmatrix}a_{xb} & a_{yb} &a_{zb}\end{pmatrix}^T</script>为加速度计的测量值，即加速度矢量在机体坐标系下的表示，则机体的俯仰角和滚转角为：</p>
+<ul>
+<li><p>俯仰角：<script type="math/tex">\theta_{a}=arcsin(\frac{a_{xb}}{g})</script></p>
+</li>
+<li><p>滚转角：<script type="math/tex">\phi_a=-arcsin(\frac{a_{yb}}{gcos\theta_a})</script></p>
+</li>
+</ul>
+<p>加速度计没有累积误差，但动态响应特性较差，测量噪声较大。                      </p>
+<h3 id="2-2-陀螺仪："><a href="#2-2-陀螺仪：" class="headerlink" title="2.2 陀螺仪："></a>2.2 陀螺仪：</h3><p>陀螺仪可以测量机体角速度在机体坐标系下的表示，测量值可记为<script type="math/tex">^{b}\boldsymbol{\omega}=\begin{pmatrix}\omega_{xb} & \omega_{yb} &\omega_{zb}\end{pmatrix}^T</script>。</p>
+<p>在小角度的情况下，三个欧拉角的变化率近似等于机体角速度在机体坐标系下的表示，此时直接对机体角速度进行离散积分即可得到三个欧拉角。</p>
+<p>但当进行大角度飞行时，必须先由<script type="math/tex">\begin{pmatrix}\dot{\phi}\\\dot{\theta} \\\dot{\psi}\end{pmatrix} = \begin{pmatrix}1& tan\theta sin\phi &tan\theta cos\phi\\0&cos\phi  &-sin\phi \\0 & sin\phi / cos\theta&cos\phi /cos\theta\end{pmatrix}\begin{pmatrix}\omega_{xb}\\\omega_{yb} \\\omega_{zb}\end{pmatrix}</script>得到三个欧拉角的变化率，然后再对三个欧拉角的变化率分别进行离散积分，才能得到正确的欧拉角。</p>
+<p>陀螺仪动态响应快，测量精度高，但是在积分得到角度的过程中不可避免的会产生累积误差。</p>
+<h3 id="2-3-磁力计："><a href="#2-3-磁力计：" class="headerlink" title="2.3 磁力计："></a>2.3 磁力计：</h3><p>磁力计可以测出地磁场在机体坐标系下的坐标：<script type="math/tex">^{b}\boldsymbol{m}=\begin{pmatrix}m_{xb} & m_{yb} &m_{zb}\end{pmatrix}^T</script>，在得到偏航角角时。必须先利用之前得到的俯仰角和滚转角将磁力计测量值投影到水平面，得到：</p>
+<ul>
+<li>x轴分量：<script type="math/tex">\overline{m}_{xe}=m_{xb}cos\theta+m_{yb}sin\phi sin\theta+m_{zb}cos\phi sin\theta</script></li>
+<li>y轴分量：<script type="math/tex">\overline{m}_{ye}=m_{yb}cos\phi -m_{zb}sin\phi</script></li>
+</ul>
+<p>之后可以得到偏航角：                   $$\psi_{mag}=arctan2(\overline{m}_{xe},\overline{m}_{ye})$$  </p>
+<p>磁力计没有累积误差，但动态响应特性较差，测量噪声较大，且容易受到干扰。</p>
+<h2 id="3-状态估计：滤波算法"><a href="#3-状态估计：滤波算法" class="headerlink" title="3 状态估计：滤波算法"></a>3 状态估计：滤波算法</h2><p>在尝试各种滤波算法时，采用的平台为维特智能的JY901B九轴传感器，其可以通过串口或I2C回传加速度计、陀螺仪和磁力计的原始数据，也可以回传其内部自带算法解算得到的四元数和欧拉角。我在进行测试的时候，认为其内部自带的解算算法解算出的值较为准确，将我采用自己的算法解算出来的数据和其进行比较，大致确定每一种算法的优劣。并感受不同算法的特点。</p>
+<p><strong>本小节所有数据均为实测。</strong></p>
+<h3 id="3-1-互补滤波："><a href="#3-1-互补滤波：" class="headerlink" title="3.1 互补滤波："></a>3.1 互补滤波：</h3><h4 id="3-1-1-原理："><a href="#3-1-1-原理：" class="headerlink" title="3.1.1 原理："></a>3.1.1 原理：</h4><p>简单来说，互补滤波就是对加速度计和磁力计解算得到的数据进行低通滤波，对陀螺仪解算得到的数据进行高通滤波。既可以保留加速度计和磁力计解算得到的数据无漂移的优势保留，也可以将陀螺仪解算得到的数据噪声小的优势保留下来。</p>
+<p>以俯仰角为例，互补滤波的一般形式为：$$\hat{\theta}(k)=\frac{\tau}{\tau+T_s}(\hat{\theta}(k-1)+T_s\omega_{yb}(k))+\frac{T_s}{\tau+T_s}\theta_{a}(k)$$</p>
+<p>一般系数取为0.95和0.05，则实际中的形式一般为：$$\hat{\theta}(k)=0.95(\hat{\theta}(k-1)+T_s\omega_{yb}(k))+0.05\theta_{a}(k)$$</p>
+<p>滚转角和俯仰角也是同理。</p>
+<h4 id="3-1-2-效果："><a href="#3-1-2-效果：" class="headerlink" title="3.1.2 效果："></a>3.1.2 效果：</h4><h5 id="3-1-2-1-互补滤波解算和传感器自带解算的比较："><a href="#3-1-2-1-互补滤波解算和传感器自带解算的比较：" class="headerlink" title="3.1.2.1 互补滤波解算和传感器自带解算的比较："></a>3.1.2.1 互补滤波解算和传感器自带解算的比较：</h5><p>俯仰角Pitch互补滤波解算比较：</p>
+<p><img src="/img/IMU_solve/CF_Pitch.svg" srcset="/img/loading.gif" lazyload alt="CF_Pitch"  /></p>
+<p>滚转角Roll互补滤波解算比较：</p>
+<p><img src="/img/IMU_solve/CF_Roll.svg" srcset="/img/loading.gif" lazyload alt="CF_Roll"></p>
+<p>偏航角Yaw互补滤波解算比较：</p>
+<p><img src="/img/IMU_solve/CF_Yaw.svg" srcset="/img/loading.gif" lazyload alt="CF_Yaw"></p>
+<p>互补滤波的解算值和传感器自身解算的标准值之间还是存在很大差异，尤其是在姿态变化大的时候差距尤为明显。互补滤波感觉响应较慢，在姿态大幅快速变化时无法快速收敛。且在欧拉角较大时存在解算失效的问题，俯仰角和滚转角的解算值很少能超过80°。</p>
+<h5 id="3-1-2-2-互补滤波各个值之间的比较分析："><a href="#3-1-2-2-互补滤波各个值之间的比较分析：" class="headerlink" title="3.1.2.2 互补滤波各个值之间的比较分析："></a>3.1.2.2 互补滤波各个值之间的比较分析：</h5><p><img src="/img/IMU_solve/CF_Compare.svg" srcset="/img/loading.gif" lazyload alt="CF_Compare" style="zoom:150%;" /></p>
+<p>从上图中可以看出，加速度计解算出的值动态响应很快但数据噪声较大，仅使用陀螺仪解算出的值较为平滑且噪声较小，但随着时间会有累积误差导致解算的值不断漂移。互补滤波融合之后的值不仅动态响应较快没有累积误差，且没有噪声数据较为平滑，综合保留了两者的优点。</p>
+<h4 id="3-1-3-代码：STM32F405"><a href="#3-1-3-代码：STM32F405" class="headerlink" title="3.1.3 代码：STM32F405"></a>3.1.3 代码：STM32F405</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">//互补滤波进行解算:</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">Get_Eular_Angle_CF</span><span class="hljs-params">(<span class="hljs-keyword">float</span> gx, <span class="hljs-keyword">float</span> gy, <span class="hljs-keyword">float</span> gz, <span class="hljs-keyword">float</span> ax, <span class="hljs-keyword">float</span> ay, <span class="hljs-keyword">float</span> az, <span class="hljs-keyword">float</span> mx, <span class="hljs-keyword">float</span> my, <span class="hljs-keyword">float</span> mz)</span></span><br><span class="hljs-function"></span>&#123;<br>      <span class="hljs-comment">//测量实际的测量间隔，用于陀螺仪积分时时间间隔的确定</span><br>	  INS_dt= (cnt - INS_cnt2)/<span class="hljs-number">1000.0f</span>;<br>      INS_cnt2 = cnt;<br>	  <br>      <span class="hljs-comment">//由机体角速度得到三个欧拉家的变化率</span><br>	  detla_roll =  gx <br>	              + <span class="hljs-built_in">sin</span>(pitch/<span class="hljs-number">57.3f</span>)*<span class="hljs-built_in">sin</span>(roll/<span class="hljs-number">57.3f</span>)/<span class="hljs-built_in">cos</span>(pitch/<span class="hljs-number">57.3f</span>)*gy <br>	              + <span class="hljs-built_in">sin</span>(pitch/<span class="hljs-number">57.3f</span>)*<span class="hljs-built_in">cos</span>(roll/<span class="hljs-number">57.3f</span>)/<span class="hljs-built_in">cos</span>(pitch/<span class="hljs-number">57.3f</span>)*gz;<br>	  detla_pitch = <span class="hljs-built_in">cos</span>(roll/<span class="hljs-number">57.3f</span>)*gy - <span class="hljs-built_in">sin</span>(roll/<span class="hljs-number">57.3f</span>)*gz;<br>      detla_yaw =  <span class="hljs-built_in">sin</span>(roll/<span class="hljs-number">57.3f</span>)/<span class="hljs-built_in">cos</span>(pitch/<span class="hljs-number">57.3f</span>)*gy <br>                 - <span class="hljs-built_in">cos</span>(roll/<span class="hljs-number">57.3f</span>)/<span class="hljs-built_in">cos</span>(pitch/<span class="hljs-number">57.3f</span>)*gz;<br>	  <br>      <span class="hljs-comment">//俯仰角Pitch解算</span><br>	  Pitch_Accelerometer_CF = <span class="hljs-built_in">asin</span>(ax)*<span class="hljs-number">57.3f</span>;<span class="hljs-comment">//加速度计</span><br>	  Pitch_Gyroscope_CF = Pitch_Last_CF - INS_cnt1 * detla_pitch;<span class="hljs-comment">//陀螺仪</span><br>	  pitch = <span class="hljs-number">0.05f</span>*Pitch_Accelerometer_CF + <span class="hljs-number">0.95f</span>*Pitch_Gyroscope_CF;<span class="hljs-comment">//互补滤波</span><br>	  Pitch_Last_CF = Data_Complementary_Filter.pitch;<br>	<br>      <span class="hljs-comment">//在J-scope中查看数据波形</span><br>	  JS_Pitch_Accelerometer_CF = (<span class="hljs-keyword">int</span>)(Pitch_Accelerometer_CF*<span class="hljs-number">100</span>);<br>	  JS_Pitch_CF = (<span class="hljs-keyword">int</span>)(Data_Complementary_Filter.pitch*<span class="hljs-number">100</span>);<br>	  JS_Pitch_gy_CF = (<span class="hljs-keyword">int</span>)(Pitch_gy_CF*<span class="hljs-number">100</span>);<br>     <br>      <span class="hljs-comment">//滚转角Roll解算</span><br>  	  Roll_Accelerometer_CF = -<span class="hljs-built_in">asin</span>(ay/<span class="hljs-built_in">cos</span>(Pitch_Accelerometer_CF/<span class="hljs-number">57.3f</span>))*<span class="hljs-number">57.3f</span>;<br>      Roll_Gyroscope_CF  = Roll_Last_CF - INS_dt * detla_roll;<br>	  roll = <span class="hljs-number">0.05f</span>*Roll_Accelerometer_CF + <span class="hljs-number">0.95f</span>*Roll_Gyroscope_CF;<br>	  Roll_Last_CF = Data_Complementary_Filter.roll;<br>		<br>      <span class="hljs-comment">//将磁力计解算的数据投影到水平面</span><br>	  mxe =  mx*<span class="hljs-built_in">cos</span>(pitch/<span class="hljs-number">57.3f</span>)<br>		   + my*<span class="hljs-built_in">sin</span>(roll/<span class="hljs-number">57.3f</span>)*<span class="hljs-built_in">sin</span>(pitch/<span class="hljs-number">57.3f</span>)<br>		   + mz*<span class="hljs-built_in">cos</span>(roll/<span class="hljs-number">57.3f</span>)*<span class="hljs-built_in">sin</span>(pitch/<span class="hljs-number">57.3f</span>);<br>	  mye =  my*<span class="hljs-built_in">cos</span>(roll/<span class="hljs-number">57.3f</span>)<br>		   - mz*<span class="hljs-built_in">sin</span>(roll/<span class="hljs-number">57.3f</span>);<br>      <span class="hljs-comment">//偏航角Yaw解算</span><br>	  Yaw_Magnetometer_CF = <span class="hljs-built_in">atan2</span>(mxe,mye) * <span class="hljs-number">57.3f</span>;			<br>	  Yaw_Gyroscope_CF = Yaw_Last_CF - INS_dt * detla_yaw;<br>	  yaw = <span class="hljs-number">0.05f</span>*Yaw_Magnetometer_CF + <span class="hljs-number">0.95f</span>*Yaw_Gyroscope_CF;<br>	  Yaw_Last_CF = yaw;<br>		<br>	  JS_Yaw_CF = (<span class="hljs-keyword">int</span>)(Data_Complementary_Filter.yaw*<span class="hljs-number">100</span>);	<br>&#125;<br></code></pre></td></tr></table></figure>
+<h3 id="3-2-卡尔曼滤波："><a href="#3-2-卡尔曼滤波：" class="headerlink" title="3.2 卡尔曼滤波："></a>3.2 卡尔曼滤波：</h3><p>未完待续。。。。。。</p>
+<h3 id="3-3-Mahony滤波算法：基于四元数"><a href="#3-3-Mahony滤波算法：基于四元数" class="headerlink" title="3.3 Mahony滤波算法：基于四元数"></a>3.3 Mahony滤波算法：基于四元数</h3><h4 id="3-3-1-原理："><a href="#3-3-1-原理：" class="headerlink" title="3.3.1 原理："></a>3.3.1 原理：</h4><h4 id="3-3-1-1-综合分析："><a href="#3-3-1-1-综合分析：" class="headerlink" title="3.3.1.1 综合分析："></a>3.3.1.1 综合分析：</h4><p>Mahony滤波算法整体来看，可以分为以下几步：</p>
+<ul>
+<li>根据目前估计的四元数，将机体坐标系下的磁力计数据转换到地球固连坐标系下，得到水平方向标准磁场方向</li>
+<li>将标准磁场方向和重力加速度方向利用当前估计的四元数再转换到机体坐标系下</li>
+<li>将测量的加速度和磁场方向在机体坐标系下的值和上一步中转换出的值求误差(叉积)，反映当前估计四元数的不准确程度</li>
+<li>利用PID将求得的误差用于修正陀螺仪测得的机体角速度</li>
+<li>利用机体角速度得到四元数导数，利用四元数导数更新当前估计的四元数，不断迭代修正四元数的估计值</li>
+<li>将实时估计的四元数转换成欧拉角实时输出</li>
+</ul>
+<p>总结一下，其实整个算法可以看做两大步：<strong>计算误差和修正估计</strong>。算法基于四元数进行优化估计。</p>
+<h4 id="3-3-1-2-计算误差："><a href="#3-3-1-2-计算误差：" class="headerlink" title="3.3.1.2 计算误差："></a>3.3.1.2 计算误差：</h4><p>误差估计的核心思想在于：地球固连坐标系<script type="math/tex">O_ex_ey_ez_e</script>中，加速度向量归一化的值为<script type="math/tex">\begin{pmatrix}0 & 0 &1\end{pmatrix}^T</script>，即只有向下的1g的重力加速度；磁力计测量的数据在地球固连坐标系中为<script type="math/tex">\begin{pmatrix}h_x & 0 &h_z\end{pmatrix}^T</script>，即只在x和z方向有值。上面描述的是理想值，理论上我们如果将上面的两个向量利用四元数转换到机体坐标系下，得到的值应当与加速度计和磁力计测量的值相等，但实际情况中两个值肯定不相等，我们就要计算出这两者之间的误差，利用这个误差进行下一步的修正。</p>
+<p>具体步骤为：</p>
+<p><strong>（1）将加速度计和磁力计测得的值归一化：</strong></p>
+<p>归一化之后加速度计测得的加速度在机体坐标系下的值记为<script type="math/tex">^{b}\boldsymbol{a}=\begin{pmatrix}a_{xb} & a_{yb} &a_{zb}\end{pmatrix}^T</script>，磁力计测得的磁场数据在机体坐标系下的值记为<script type="math/tex">^{b}\boldsymbol{m}=\begin{pmatrix}m_{xb} & m_{yb} &m_{zb}\end{pmatrix}^T</script></p>
+<p><strong>（2）求取地球固连坐标系下的参考加速度和磁场方向：</strong></p>
+<p>将测得的磁场方向在机体坐标系下的值转换到地球固连坐标系下：$$^{e}\boldsymbol{m}=\begin{pmatrix}m_{xe} \\ m_{ye} \\ m_{ze}\end{pmatrix}=\boldsymbol{C}(\boldsymbol{q}_e^b)\begin{pmatrix}m_{xb} \\ m_{yb} \\ m_{zb}\end{pmatrix}=\begin{pmatrix}q_0^2+q_1^2-q_2^2-q_3^2&2(q_1q_2-q_0q_3)&2(q_1q_3+q_0q_2)\\2(q_1q_2+q_0q_3)&q_0^2-q_1^2+q_2^2-q_3^2&2(q_2q_3-q_0q_1)\\2(q_1q_3-q_0q_2)&2(q_2q_3+q_0q_1)&q_0^2-q_1^2-q_2^2+q_3^2\end{pmatrix}\begin{pmatrix}m_{xb} \\ m_{yb} \\ m_{zb}\end{pmatrix}$$</p>
+<p>计算<script type="math/tex">^{e}\boldsymbol{m}</script>在水平和竖直方向上的投影：<script type="math/tex">h_{xe}=\sqrt{m_{xe}^2+m_{ye}^2}，h_{ze}=m_{ze}</script></p>
+<p>则磁场方向在地球固连坐标系下的理想参考方向为<script type="math/tex">^{e}\boldsymbol{h}_r=\begin{pmatrix}h_{xe} & 0 &h_{ze}\end{pmatrix}^T</script>。</p>
+<p>加速度在地球固连坐标系下的理想参考方向为<script type="math/tex">^{e}\boldsymbol{a}_r=\begin{pmatrix}0 & 0&1\end{pmatrix}^T</script>，即为重力加速度。</p>
+<p><strong>（3）将地球固连坐标系下的参考加速度和磁场方向转换到机体坐标系下：</strong></p>
+<p>磁场方向在机体坐标系下的理想参考值为：$$^{b}\boldsymbol{h}_r=\begin{pmatrix}h^r_{xb} \\ h^r_{yb} \\ h^r_{zb}\end{pmatrix}=(\boldsymbol{C}(\boldsymbol{q}_e^b))^T\begin{pmatrix}h_{xe} \\ 0 \\ h_{ze}\end{pmatrix}=\begin{pmatrix}q_0^2+q_1^2-q_2^2-q_3^2&2(q_1q_2+q_0q_3)&2(q_1q_3-q_0q_2)\\2(q_1q_2-q_0q_3)&q_0^2-q_1^2+q_2^2-q_3^2&2(q_2q_3+q_0q_1)\\2(q_1q_3+q_0q_2)&2(q_2q_3-q_0q_1)&q_0^2-q_1^2-q_2^2+q_3^2\end{pmatrix}\begin{pmatrix}h_{xe} \\ 0 \\ h_{ze}\end{pmatrix}$$</p>
+<p>加速度在机体坐标系下的理想参考值为：$$^{b}\boldsymbol{a}_r=\begin{pmatrix}a^r_{xb} \\a^r_{yb} \\ a^r_{zb}\end{pmatrix}=(\boldsymbol{C}(\boldsymbol{q}_e^b))^T\begin{pmatrix}0 \\ 0 \\ 1\end{pmatrix}=\begin{pmatrix}q_0^2+q_1^2-q_2^2-q_3^2&2(q_1q_2+q_0q_3)&2(q_1q_3-q_0q_2)\\2(q_1q_2-q_0q_3)&q_0^2-q_1^2+q_2^2-q_3^2&2(q_2q_3+q_0q_1)\\2(q_1q_3+q_0q_2)&2(q_2q_3-q_0q_1)&q_0^2-q_1^2-q_2^2+q_3^2\end{pmatrix}\begin{pmatrix}0 \\ 0 \\ 1\end{pmatrix}$$</p>
+<p><strong>（4）利用叉积计算加速度和磁场方向在机体坐标系下测量值和理想参考值之间的误差：</strong></p>
+<p>误差为：$$^{b}\boldsymbol{e}= \ ^{b}\boldsymbol{m}\times \ ^{b}\boldsymbol{h}_r+ \ ^{b}\boldsymbol{a}\times\ ^{b}\boldsymbol{a}_r$$</p>
+<p>即： $$\begin{pmatrix}e_{x} \\ e_{y} \\ e_{z}\end{pmatrix}=\begin{pmatrix}m_{yb}h^r_{zb}-m_{zb}h^r_{yb} \\ m_{zb}h^r_{xb}-m_{xb}h^r_{zb}\\ m_{xb}h^r_{yb}-m_{yb}h^r_{xb}\end{pmatrix}+\begin{pmatrix}a_{yb}a^r_{zb}-a_{zb}a^r_{yb} \\ a_{zb}a^r_{xb}-a_{xb}a^r_{zb}\\ a_{xb}a^r_{yb}-a_{yb}a^r_{xb}\end{pmatrix}$$</p>
+<h4 id="3-3-1-3-修正估计："><a href="#3-3-1-3-修正估计：" class="headerlink" title="3.3.1.3 修正估计："></a>3.3.1.3 修正估计：</h4><p><strong>（1）利用误差修正陀螺仪测量的机体角速度：</strong></p>
+<p>陀螺仪测得的机体角速度在机体坐标系下的值记为<script type="math/tex">^{b}\boldsymbol{\omega}^m=\begin{pmatrix}\omega^m_{xb} & \omega^m_{yb} &\omega^m_{zb}\end{pmatrix}^T</script>，修正过后的值记为<script type="math/tex">^{b}\boldsymbol{\omega}=\begin{pmatrix}\omega_{xb} & \omega_{yb} &\omega_{zb}\end{pmatrix}^T</script>。</p>
+<p>则修正利用误差项通过<strong>PID</strong>进行：$$^{b}\boldsymbol{\omega}= \ ^{b}\boldsymbol{\omega}^m+K_p\times  \ ^{b}\boldsymbol{e}+K_i\times \int \ ^{b}\boldsymbol{e}  $$</p>
+<p><strong>（2）利用修正过的机体角速度计算四元数导数：</strong>$$\dot{\boldsymbol{q}_e^b}=\frac{1}{2}\begin{pmatrix}0&-\omega_{xb}&-\omega_{yb}&-\omega_{zb} \\\omega_{xb}&0&\omega_{zb}&-\omega_{yb}\\\omega_{yb}&-\omega_{zb}&0& \omega_{xb}\\\omega_{zb}&\omega_{yb}&-\omega_{xb}&0\end{pmatrix}\begin{pmatrix}q_0 \\ q_1 \\q_2\\q_3\end{pmatrix}$$</p>
+<p><strong>（3）利用四元数导数更新四元数的估计值：</strong> $$\boldsymbol{q}_e^b[n] = \boldsymbol{q}_e^b[n-1] +T_s\times \dot{\boldsymbol{q}_e^b}$$           </p>
+<p>上式中<script type="math/tex">T_s</script>为采样间隔。  </p>
+<h4 id="3-3-2-效果："><a href="#3-3-2-效果：" class="headerlink" title="3.3.2 效果："></a>3.3.2 效果：</h4><p>俯仰角Pitch解算比较：</p>
+<p><img src="/img/IMU_solve/MH_Pitch.svg" srcset="/img/loading.gif" lazyload alt="MH_Pitch"></p>
+<p>滚转角Roll解算比较：</p>
+<p><img src="/img/IMU_solve/MH_Roll.svg" srcset="/img/loading.gif" lazyload alt="MH_Roll"></p>
+<p>偏航角Yaw解算比较：</p>
+<p><img src="/img/IMU_solve/MH_Yaw.svg" srcset="/img/loading.gif" lazyload alt="MH_Yaw"></p>
+<p>可以看到，Mahony算法解算的结果和标准解算的结果很接近，动态响应较快，可以跟上较快的角度变化。在欧拉角较大的时候也能进行正常的解算。</p>
+<h4 id="3-3-3-代码：STM32F405"><a href="#3-3-3-代码：STM32F405" class="headerlink" title="3.3.3 代码：STM32F405"></a>3.3.3 代码：STM32F405</h4><figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br></pre></td><td class="code"><pre><code class="hljs c++"><span class="hljs-comment">//mahony解算算法:</span><br><br><span class="hljs-keyword">float</span> mahony_Kp = <span class="hljs-number">2.0f</span>;<span class="hljs-comment">//PID的参数</span><br><span class="hljs-keyword">float</span> mahony_Ki = <span class="hljs-number">0.005f</span>;<span class="hljs-comment">//PID的参数      </span><br><span class="hljs-keyword">float</span> mahony_halfT = <span class="hljs-number">0.0025f</span>;<span class="hljs-comment">//采样周期的一半</span><br><br><span class="hljs-keyword">static</span> <span class="hljs-keyword">float</span> q0 = <span class="hljs-number">1</span>, q1 = <span class="hljs-number">0</span>, q2 = <span class="hljs-number">0</span>, q3 = <span class="hljs-number">0</span>;<span class="hljs-comment">//待估计的四元数        </span><br><span class="hljs-keyword">static</span> <span class="hljs-keyword">float</span> exInt = <span class="hljs-number">0</span>, eyInt = <span class="hljs-number">0</span>, ezInt = <span class="hljs-number">0</span>;<span class="hljs-comment">//PID中的积分项</span><br><br><span class="hljs-keyword">float</span> norm;  <br><span class="hljs-keyword">float</span> hx, hy, hz, bx, bz;  <br><span class="hljs-keyword">float</span> vx, vy, vz, wx, wy, wz;   <br><span class="hljs-keyword">float</span> ex, ey, ez;  <br><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">mahony_AHRSupdate</span><span class="hljs-params">(<span class="hljs-keyword">float</span> gx, <span class="hljs-keyword">float</span> gy, <span class="hljs-keyword">float</span> gz, <span class="hljs-keyword">float</span> ax, <span class="hljs-keyword">float</span> ay, <span class="hljs-keyword">float</span> az, <span class="hljs-keyword">float</span> mx, <span class="hljs-keyword">float</span> my, <span class="hljs-keyword">float</span> mz)</span> </span><br><span class="hljs-function"></span>&#123;     <br>     <span class="hljs-comment">//实测的采样周期的一半</span><br>	 mahony_halfT = INS_cnt1/<span class="hljs-number">2.f</span>;<br>  <br>	 <span class="hljs-comment">//避免重复计算</span><br>	 <span class="hljs-keyword">float</span> q0q0 = q0*q0;  <br>	 <span class="hljs-keyword">float</span> q0q1 = q0*q1;  <br>	 <span class="hljs-keyword">float</span> q0q2 = q0*q2;  <br>	 <span class="hljs-keyword">float</span> q0q3 = q0*q3;  <br>	 <span class="hljs-keyword">float</span> q1q1 = q1*q1;  <br>	 <span class="hljs-keyword">float</span> q1q2 = q1*q2;  <br>	 <span class="hljs-keyword">float</span> q1q3 = q1*q3;  <br>	 <span class="hljs-keyword">float</span> q2q2 = q2*q2;  <br>	 <span class="hljs-keyword">float</span> q2q3 = q2*q3;  <br>	 <span class="hljs-keyword">float</span> q3q3 = q3*q3;  <br>		<br>	 <span class="hljs-comment">//将加速度计和磁力计测量数据归一化  </span><br>	 norm = <span class="hljs-built_in">sqrt</span>(ax*ax + ay*ay + az*az);  <br>	 <span class="hljs-keyword">if</span>(norm!=<span class="hljs-number">0</span>)<br>	 &#123;<br>	   ax = ax / norm;  <br>	   ay = ay / norm;  <br>	   az = az / norm; <br>	 &#125;		 <br>	 norm = <span class="hljs-built_in">sqrt</span>(mx*mx + my*my + mz*mz);<br>    <span class="hljs-keyword">if</span>(norm!=<span class="hljs-number">0</span>)<br>	 &#123;	 <br>	   mx = mx / norm;  <br>	   my = my / norm;  <br>	   mz = mz / norm;  <br>	 &#125;<br>		<br>	 <span class="hljs-comment">//将磁力计测量的数据转换到地面固连坐标系下 </span><br>	 hx = <span class="hljs-number">2</span>*mx*(<span class="hljs-number">0.5</span> - q2q2 - q3q3) + <span class="hljs-number">2</span>*my*(q1q2 - q0q3) + <span class="hljs-number">2</span>*mz*(q1q3 + q0q2);  <br>	 hy = <span class="hljs-number">2</span>*mx*(q1q2 + q0q3) + <span class="hljs-number">2</span>*my*(<span class="hljs-number">0.5</span> - q1q1 - q3q3) + <span class="hljs-number">2</span>*mz*(q2q3 - q0q1);  <br>	 hz = <span class="hljs-number">2</span>*mx*(q1q3 - q0q2) + <span class="hljs-number">2</span>*my*(q2q3 + q0q1) + <span class="hljs-number">2</span>*mz*(<span class="hljs-number">0.5</span> - q1q1 -q2q2);        <br>	 bx = <span class="hljs-built_in">sqrt</span>((hx*hx) + (hy*hy));  <br>	 bz = hz;  <br>		<br>     <span class="hljs-comment">//将地面固连坐标系下标准重力加速度和磁场方向再转换到机体坐标系下 </span><br>	 vx = <span class="hljs-number">2</span>*(q1q3 - q0q2);  <br>	 vy = <span class="hljs-number">2</span>*(q0q1 + q2q3);  <br>	 vz = q0q0 - q1q1 - q2q2 + q3q3;  <br>	 wx = <span class="hljs-number">2</span>*bx*(<span class="hljs-number">0.5</span> - q2q2 - q3q3) + <span class="hljs-number">2</span>*bz*(q1q3 - q0q2);  <br>	 wy = <span class="hljs-number">2</span>*bx*(q1q2 - q0q3) + <span class="hljs-number">2</span>*bz*(q0q1 + q2q3);  <br>	 wz = <span class="hljs-number">2</span>*bx*(q0q2 + q1q3) + <span class="hljs-number">2</span>*bz*(<span class="hljs-number">0.5</span> - q1q1 - q2q2);   <br>            <br>     <span class="hljs-comment">//计算实际测量值和上面转换后的参考值之间的误差，误差用叉积来计算</span><br>	 ex = (ay*vz - az*vy) + (my*wz - mz*wy);  <br>	 ey = (az*vx - ax*vz) + (mz*wx - mx*wz);  <br>	 ez = (ax*vy - ay*vx) + (mx*wy - my*wx);  <br>            <br>	 <span class="hljs-comment">//计算PID中误差的积分</span><br>	 exInt = exInt + ex*mahony_Ki* (INS_cnt1);  <br>	 eyInt = eyInt + ey*mahony_Ki* (INS_cnt1);  <br>	 ezInt = ezInt + ez*mahony_Ki* (INS_cnt1);  <br>	 <span class="hljs-comment">//利用上面计算的误差来调整机体角速度，思想为PID </span><br>	 gx = gx + mahony_Kp*ex + exInt;  <br>	 gy = gy + mahony_Kp*ey + eyInt;  <br>	 gz = gz + mahony_Kp*ez + ezInt;  <br>            <br>	 <span class="hljs-comment">//利用上面的四元数导数和机体坐标系的关系得到四元数导数，然后更新当前四元数的估计值</span><br>	 q0 = q0 + (-q1*gx - q2*gy - q3*gz)*mahony_halfT;  <br>	 q1 = q1 + (q0*gx + q2*gz - q3*gy)*mahony_halfT;  <br>	 q2 = q2 + (q0*gy - q1*gz + q3*gx)*mahony_halfT;  <br>	 q3 = q3 + (q0*gz + q1*gy - q2*gx)*mahony_halfT;   <br>		<br>	 <span class="hljs-comment">//归一化得到单位四元数</span><br>	 norm = <span class="hljs-built_in">sqrt</span>(q0*q0 + q1*q1 + q2*q2 + q3*q3);  <br>	 q0 = q0 / norm;  <br>	 q1 = q1 / norm;  <br>	 q2 = q2 / norm;  <br>	 q3 = q3 / norm;  <br>&#125;  <br><br><span class="hljs-keyword">int</span> JS_Pitch_Mahony;<br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">Get_Eular_Angle_Mahony</span><span class="hljs-params">(<span class="hljs-keyword">void</span>)</span></span><br><span class="hljs-function"></span>&#123;<br>     <span class="hljs-comment">//调用上面Mahony的算法得到四元数的估计值</span><br>     <span class="hljs-comment">//注意角速度单位为rad/s</span><br>	 <span class="hljs-built_in">mahony_AHRSupdate</span>(JY_901B_Data.Gyroscope.gx/<span class="hljs-number">57.3f</span>,                     <br>                       JY_901B_Data.Gyroscope.gy/<span class="hljs-number">57.3f</span>,<br>                       JY_901B_Data.Gyroscope.gz/<span class="hljs-number">57.3f</span>, <br>		               JY_901B_Data.Accelerometer.ax, <br>                       JY_901B_Data.Accelerometer.ay, <br>                       JY_901B_Data.Accelerometer.az, <br>	                   JY_901B_Data.magnetometer.mx, <br>                       JY_901B_Data.magnetometer.my, <br>                       JY_901B_Data.magnetometer.mz);<br>    <br>     <span class="hljs-comment">//由四元数得到欧拉角</span><br>     Data_Mahony.pitch = <span class="hljs-built_in">asin</span>(<span class="hljs-number">2</span>*(q0*q2-q1*q3)) * <span class="hljs-number">57.3f</span>;<br>	 Data_Mahony.roll = <span class="hljs-built_in">atan2</span>(<span class="hljs-number">2</span>*(q0*q1+q2*q3),<span class="hljs-number">1</span><span class="hljs-number">-2</span>*q1*q1<span class="hljs-number">-2</span>*q2*q2) *<span class="hljs-number">57.3f</span>;<br>	 Data_Mahony.yaw = <span class="hljs-built_in">atan2</span>(<span class="hljs-number">2</span>*(q0*q3+q1*q2),<span class="hljs-number">1</span><span class="hljs-number">-2</span>*q3*q3<span class="hljs-number">-2</span>*q2*q2) *<span class="hljs-number">57.3f</span>;<br>	 <br>     <span class="hljs-comment">//在J-scope中显示波形</span><br>	 JS_Pitch_Mahony = -(<span class="hljs-keyword">int</span>)(<span class="hljs-number">100</span>*Data_Mahony.pitch);<br>&#125;<br></code></pre></td></tr></table></figure>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/IMU/">IMU</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/12/04/%E6%B7%B1%E7%A9%BA%E5%90%8E%E6%9C%9F%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">我的深空摄影后期处理流程</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/12/02/%E7%94%B5%E6%9C%BA%E4%BA%91%E5%8F%B0%E7%B3%BB%E7%BB%9F%E8%BE%A8%E8%AF%86%E6%96%B9%E6%B3%95/">
+                        <span class="hidden-mobile">电机和云台系统辨识方法</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;TOC</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        loader: {
+          load: ['ui/lazy']
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

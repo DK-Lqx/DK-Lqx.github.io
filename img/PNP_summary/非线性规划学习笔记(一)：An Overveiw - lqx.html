@@ -1,0 +1,594 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/browser_tab.jpeg">
+  <link rel="icon" href="/img/browser_tab.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="">
+  <meta name="author" content="lqx">
+  <meta name="keywords" content="">
+  <meta name="description" content="非线性规划学习笔记(一)：An Overveiw0 目录[TOC] 1 引言最近快到期末了，认真的看了一下翟桥柱老师的运筹学课件，老师的课件做的详实且富有启发性。在阅读的时候不仅让我建立起了很多直观上的感受，并且跟随老师的步伐完成了大部分定理的证明。完成证明的时候深深感受到了数学这门学科的精妙，线性代数和多元函数微积分理论的优美，以及自己数学功底依然很薄弱的这个事实。遗憾的是，运筹学这门课的学时实">
+<meta property="og:type" content="website">
+<meta property="og:title" content="page.title">
+<meta property="og:url" content="http://example.com/img/PNP_summary/%E9%9D%9E%E7%BA%BF%E6%80%A7%E8%A7%84%E5%88%92%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0(%E4%B8%80)%EF%BC%9AAn%20Overveiw%20-%20lqx.html">
+<meta property="og:site_name" content="Robotics and Astronomy by lqx">
+<meta property="og:description" content="非线性规划学习笔记(一)：An Overveiw0 目录[TOC] 1 引言最近快到期末了，认真的看了一下翟桥柱老师的运筹学课件，老师的课件做的详实且富有启发性。在阅读的时候不仅让我建立起了很多直观上的感受，并且跟随老师的步伐完成了大部分定理的证明。完成证明的时候深深感受到了数学这门学科的精妙，线性代数和多元函数微积分理论的优美，以及自己数学功底依然很薄弱的这个事实。遗憾的是，运筹学这门课的学时实">
+<meta property="og:locale" content="en_US">
+<meta property="article:published_time" content="2021-12-07T02:24:22.261Z">
+<meta property="article:modified_time" content="2021-12-07T02:24:22.261Z">
+<meta property="article:author" content="lqx">
+<meta name="twitter:card" content="summary_large_image">
+  
+  <title>page.title - Robotics and Astronomy by lqx</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.12","typing":{"enable":false,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 60vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>DK-L</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/default.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="page.title">
+              
+                page.title
+              
+            </span>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      <div class="container nopadding-x-md">
+        <div class="py-5" id="board"
+          >
+          
+          <div class="container">
+            <div class="row">
+              <div class="col-12 col-md-10 m-auto">
+                
+
+<article class="page-content">
+  <h1 id="非线性规划学习笔记-一-：An-Overveiw"><a href="#非线性规划学习笔记-一-：An-Overveiw" class="headerlink" title="非线性规划学习笔记(一)：An Overveiw"></a>非线性规划学习笔记(一)：An Overveiw</h1><h2 id="0-目录"><a href="#0-目录" class="headerlink" title="0 目录"></a>0 目录</h2><p>[TOC]</p>
+<h2 id="1-引言"><a href="#1-引言" class="headerlink" title="1 引言"></a>1 引言</h2><p>最近快到期末了，认真的看了一下翟桥柱老师的运筹学课件，老师的课件做的详实且富有启发性。在阅读的时候不仅让我建立起了很多直观上的感受，并且跟随老师的步伐完成了大部分定理的证明。完成证明的时候深深感受到了数学这门学科的精妙，线性代数和多元函数微积分理论的优美，以及自己数学功底依然很薄弱的这个事实。遗憾的是，运筹学这门课的学时实在过于短暂，导致翟老师没有机会给我们讲解更多优美的算法和理论。为了对最优化理论有更加全面的理解，建立对于Optimization这门课程的整体认知，我又去看了《最优化导论》这本教材，其中介绍了更多的算法，并包括了更多定理证明的细节。在看这本书的时候，一些精妙的观点常常让我有醍醐灌顶之感，大部分精妙的数学证明又让我拍案叫绝，在同线性代数和多元函数微积分作斗争的时候，我仿佛又回到了大一那段沉迷数学的快乐时光，现在想来，我已经很久没有享受过陶醉于数学之美的那种快感了。感谢Optimization这门学科，让我没有捷径可走，只能直面数学，感受数学之美。最近埋头苦学最优化理论，看了很多书和论文，便想着写这一系列的学习笔记，总结一些自己的感悟，记录一些数学。</p>
+<p>为什么题目叫非线性规划呢，是因为非线性规划不仅是Optimization最优化理论的核心，也在机器人学里得到了大量的应用，比如说trajectory optimization问题中的direct collocation method就是将积分离散化并转化为一个非线性规划得到求解。而且相对于线性规划来说，非线性规划更加困难也更加富有挑战性，常常要根据具体问题的特点选择不同的算法，因此对于不同问题和算法的特点都要有详细的了解，并且这种详细了解最好是数学的而非直觉的(因为要发论文的话数学一定要好…..)。</p>
+<h2 id="2-问题描述"><a href="#2-问题描述" class="headerlink" title="2 问题描述"></a>2 问题描述</h2><p>一般的非线性规划问题可以描述为：</p>
+<p>​                                                   <script type="math/tex">\min \ \ \ \ \ \  \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ f(\boldsymbol{x})
+\\ s.t. \ \ \ \ \ g_i(\boldsymbol{x})\le0\ , i=1,2,\cdot\cdot\cdot,p
+\\ \ \ \ \ \ \ \ \ \ \ \ \ h_i(\boldsymbol{x})=0\ , i=1,2,\cdot\cdot\cdot,m
+\\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \boldsymbol{x}\in \mathbb{R}^n</script></p>
+<p>其中，函数$f:\mathbb{R}^n\to\mathbb{R}$称为目标函数或价值函数，该优化问题的含义为寻找合适的<script type="math/tex">\boldsymbol{x}</script>，使函数$f(\boldsymbol{x})$达到最小。<script type="math/tex">\boldsymbol{x}</script>是一个<script type="math/tex">n</script>维向量，通常称为决策向量，其需要同时满足等式约束<script type="math/tex">h_i(\boldsymbol{x})=0\ , i=1,2,\cdot\cdot\cdot,m</script>和不等式约束<script type="math/tex">g_i(\boldsymbol{x})\le0\ , i=1,2,\cdot\cdot\cdot,p</script>。</p>
+<p>约束可以写成向量形式：                         <script type="math/tex">\boldsymbol{g}(\boldsymbol{x})\le\boldsymbol{0} \ , \ \boldsymbol{h}(\boldsymbol{x})=\boldsymbol{0}</script></p>
+<p>其中：                                                <script type="math/tex">\boldsymbol{h}:\mathbb{R}^n\to\mathbb{R}^m \ , \ \boldsymbol{g}:\mathbb{R}^n\to\mathbb{R}^p</script></p>
+<p>研究和学习的过程的总是从特殊到一般的过程，因此我们不会在一开始就直面这么复杂的问题，而是要循序渐进，从最简单的情形开始研究，逐渐改变目标函数和约束的形式，最终得到最一般问题的求解方法。其中，每一种问题都有独特的结构和特色，利用这些结构和特色就可以发展出针对相应问题的最优算法。</p>
+<p>故事的起点，是无约束或者集合约束优化问题：</p>
+<p>​                                                                        <script type="math/tex">\min  \ \ \ \ \ f(\boldsymbol{x})
+\\ s.t. \ \ \ \ \boldsymbol{x}\in \Omega</script></p>
+<p>其中约束集合<script type="math/tex">\Omega</script>是<script type="math/tex">n</script>维实数空间<script type="math/tex">\mathbb{R}^n</script>的一个子集。约束<script type="math/tex">\boldsymbol{x}\in \Omega</script>称为集合约束，上面提到的一般形式的约束集合<script type="math/tex">\Omega=\{ \boldsymbol{x}:\boldsymbol{g}(\boldsymbol{x})\le\boldsymbol{0} \ , \ \boldsymbol{h}(\boldsymbol{x})=\boldsymbol{0}\}</script>称为函数约束。由于集合约束比较简单，而且有一些很好的性质，所以有大量的算法都是针对于集合约束形式的，在一开始我们会先研究集合约束和无约束优化问题，这是一个很好的起点，后面更加复杂问题的算法很多也是基于无约束优化问题的算法进行改进。我们会先探讨局部极小点对应的必要条件和充分条件，以及在迭代过程中很重要的一维搜索算法，并讨论梯度方法、牛顿法、共轭方向法、拟牛顿法等多种求解算法，这些算法各有特色，使用时应根据问题的特点进行选择。</p>
+<p>之后我们会研究有约束优化问题：</p>
+<p>​                                                 <script type="math/tex">\min \ \ \ \ \ \  \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ f(\boldsymbol{x})
+\\ s.t. \ \ \ \ \ g_i(\boldsymbol{x})\le0\ , i=1,2,\cdot\cdot\cdot,p
+\\ \ \ \ \ \ \ \ \ \ \ \ \ h_i(\boldsymbol{x})=0\ , i=1,2,\cdot\cdot\cdot,m
+\\ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \ \boldsymbol{x}\in \mathbb{R}^n</script></p>
+<p>本着循序渐进的原则，我们会先研究仅含等式约束的优化问题，展示局部极小点的一阶必要条件(拉格朗日条件)，以及二阶必要条件和充分条件。之后来到同时含义等式约束和不等式约束的优化问题，展示局部极小点的一阶必要条件(KKT条件)，以及二阶必要条件和充分条件。并研究相关的求解算法：投影法、拉格朗日法、罚函数法等。</p>
+<h2 id="3-核心问题"><a href="#3-核心问题" class="headerlink" title="3 核心问题"></a>3 核心问题</h2><h3 id="3-1-算法框架"><a href="#3-1-算法框架" class="headerlink" title="3.1 算法框架"></a>3.1 算法框架</h3><p>在求解非线性规划的问题中，我们没有办法直接根据局部极小点的必要条件进行求解，因为那样就相当于直接求解大规模的非线性方程组，我们必须将问题转化为有限次运算可以解决的问题。所以说，我们必须放弃求解析解的想法，转而求解数值最优解。</p>
+<p>一种朴实的想法如下：</p>
+<p>我们先选择<script type="math/tex">\mathbb{R}^n</script>中的一个点作为起始点，然后依据某种迭代准则选取一个可以使目标函数下降的方向，沿着这个方向走一定的距离，到达一个新的位置，接着重复上述过程，选择一个下降方向，朝着这个方向走一定的距离以使目标函数下降，如此往复，直到满足停止准则（如局部极小点的必要条件得到满足），停止迭代，即认为得到了最优点。</p>
+<p>用数学公式表述如下：</p>
+<p>​                                                   <script type="math/tex">\boldsymbol{x}^{(0)}\to \boldsymbol{x}^{(1)}\to \boldsymbol{x}^{(2)}\to \cdot\cdot\cdot\cdot\cdot\to\boldsymbol{x}^{(K)}</script></p>
+<p>在从一个点迭代到下一个点的过程中，基本上所有非线性优化算法都采用相同的迭代框架：</p>
+<p>​                                                           <script type="math/tex">\boldsymbol{x}^{(k+1)}=\boldsymbol{x}^{(k)}+t_k\boldsymbol{p}^{(k)}</script></p>
+<p>从上式中可以看出，在学习算法的过程中我们比较关心的问题有两个：</p>
+<ul>
+<li>搜索方向<script type="math/tex">\boldsymbol{p}^{(k)}</script>的确定：为不同算法讨论的核心问题</li>
+<li>搜索步长<script type="math/tex">t_k</script>的确定：采用一维搜索算法得到解决</li>
+</ul>
+<p>求解非线性规划的迭代下降算法框架为：</p>
+<ul>
+<li><p>Step1：   产生初始点<script type="math/tex">\boldsymbol{x}^{(0)}\in\Omega</script>或<script type="math/tex">\boldsymbol{x}^{(0)}\in\mathbb{R}^n</script>，初始化<script type="math/tex">k=0</script></p>
+</li>
+<li><p>Step2：   由<script type="math/tex">\boldsymbol{x}^{(k)}</script>产生<script type="math/tex">\boldsymbol{x}^{(k+1)}</script>，并令<script type="math/tex">k:=k+1</script></p>
+<p>​                  一般<script type="math/tex">\boldsymbol{x}^{(k+1)}=\boldsymbol{x}^{(k)}+t_k\boldsymbol{p}^{(k)}</script></p>
+<p>​                  核心为构造<script type="math/tex">\boldsymbol{p}^{(k)}</script>并选择合适的<script type="math/tex">t_k</script></p>
+</li>
+<li><p>Step3：判断<script type="math/tex">\boldsymbol{x}^{(k)}</script>是否可接受，是则停止迭代，否则转Step2</p>
+</li>
+</ul>
+<h3 id="3-2-关键问题"><a href="#3-2-关键问题" class="headerlink" title="3.2 关键问题"></a>3.2 关键问题</h3><p>翟老师在课上总结了非线性规划的六个关键问题，总结的简直太好了，只有把一个算法的这六个问题搞懂了，才算是真正弄懂了这个算法。故摘录如下，在接下来的文章中也是按照这个顺序一一总结各个算法的相应特色。</p>
+<p>在研究和学习非线性规划时面临的六个关键问题如下：</p>
+<ul>
+<li>(局部)最优解有哪些性质？如何判定？</li>
+<li>什么样的全局性质可以使得寻找全局最优解比较容易？</li>
+<li>怎样构造(可行的)下降方向<script type="math/tex">\boldsymbol{p}^{(k)}</script>？</li>
+<li>怎样确定步长<script type="math/tex">t_k</script>？</li>
+<li>怎样确定初始点<script type="math/tex">\boldsymbol{x}^{(0)}</script>？</li>
+<li>算法的终止准则？</li>
+</ul>
+<p>下面会从这六个方面入手总结各个算法的特点。</p>
+<h2 id="4-局部最优解的性质"><a href="#4-局部最优解的性质" class="headerlink" title="4 局部最优解的性质"></a><strong>4 局部最优解的性质</strong></h2><h3 id="4-1-无约束优化"><a href="#4-1-无约束优化" class="headerlink" title="4.1 无约束优化"></a>4.1 无约束优化</h3><p>回顾一下，无约束优化的问题为：</p>
+<p>​                                                                          <script type="math/tex">\min  \ \ \ \ \ f(\boldsymbol{x})
+\\ s.t. \ \ \ \ \boldsymbol{x}\in \Omega</script></p>
+<h4 id="4-1-1-一阶必要条件"><a href="#4-1-1-一阶必要条件" class="headerlink" title="4.1.1 一阶必要条件"></a>4.1.1 一阶必要条件</h4><p>假设局部极小点位于在约束集<script type="math/tex">\Omega</script>的内部，则极小点满足的一阶必要条件为：</p>
+<p>​                                                                          <script type="math/tex">\nabla f(\boldsymbol{x}^*)=\boldsymbol{0}</script></p>
+<h4 id="4-1-2-二阶必要条件"><a href="#4-1-2-二阶必要条件" class="headerlink" title="4.1.2 二阶必要条件"></a>4.1.2 二阶必要条件</h4><p>假设局部极小点位于在约束集<script type="math/tex">\Omega</script>的内部，则极小点满足的二阶必要条件为：</p>
+<p>​                                                                          <script type="math/tex">\nabla f(\boldsymbol{x}^*)=\boldsymbol{0}</script></p>
+<p>​                                                                         <script type="math/tex">\nabla^2 f(\boldsymbol{x}^*)\ge0</script></p>
+<p>即<script type="math/tex">f(\boldsymbol{x})</script>的Hessian矩阵<script type="math/tex">\nabla^2 f(\boldsymbol{x})</script>在<script type="math/tex">\boldsymbol{x}^*</script>处是半正定的。</p>
+<h4 id="4-1-3-二阶充分条件"><a href="#4-1-3-二阶充分条件" class="headerlink" title="4.1.3 二阶充分条件"></a>4.1.3 二阶充分条件</h4><p>若<script type="math/tex">\boldsymbol{x}^*</script>是约束集的一个内点，且同时满足：</p>
+<p>​                                                                           <script type="math/tex">\nabla f(\boldsymbol{x}^*)=\boldsymbol{0}</script></p>
+<p>​                                                                           <script type="math/tex">\nabla^2 f(\boldsymbol{x}^*)>0</script>  </p>
+<p>即<script type="math/tex">\boldsymbol{x}^*</script>处<script type="math/tex">f(\boldsymbol{x})</script>的梯度为0且Hessian矩阵为正定，则<script type="math/tex">\boldsymbol{x}^*</script>是函数<script type="math/tex">f</script>的一个严格局部极小点。                                         </p>
+<h3 id="4-2-等式约束"><a href="#4-2-等式约束" class="headerlink" title="4.2 等式约束"></a>4.2 等式约束</h3><p>本节将研究以下形式约束问题局部极小点对应的条件：</p>
+<p>​                                                                         <script type="math/tex">\min  \ \ \ \ \ \ \ \ f(\boldsymbol{x})
+\\ s.t. \ \ \ \ \boldsymbol{h}(\boldsymbol{x})=\boldsymbol{0}</script></p>
+<p>在讨论含有等式约束的优化问题时，有一个很重要的概念叫做正则点，在正则点处，所有等式约束的梯度向量线性无关，即<script type="math/tex">\nabla h_1(\boldsymbol{x}),\nabla h_2(\boldsymbol{x}),...,\nabla h_m(\boldsymbol{x})</script>线性无关。</p>
+<p>接下来还要用到切线空间和法线空间的概念，定义如下：</p>
+<p>在曲面<script type="math/tex">S=\{\boldsymbol{x}\in \mathbb{R}^n,\boldsymbol{h}(\boldsymbol{x})=\boldsymbol{0}\}</script>中：</p>
+<ul>
+<li><p>点<script type="math/tex">\boldsymbol{x}^*</script>处的切线空间为集合<script type="math/tex">T(\boldsymbol{x}^*)=\{\boldsymbol{y}:D\boldsymbol{h}(\boldsymbol{x}^*)\boldsymbol{y}=\boldsymbol{0}\}</script>，为矩阵<script type="math/tex">D\boldsymbol{h}(\boldsymbol{x}^*)</script>的零空间。</p>
+</li>
+<li><p>点<script type="math/tex">\boldsymbol{x}^*</script>处的法线空间为集合<script type="math/tex">N(\boldsymbol{x}^*)=\{\boldsymbol{x}\in \mathbb{R}^n:\boldsymbol{x}=D\boldsymbol{h}(\boldsymbol{x}^*)^T\boldsymbol{z},\boldsymbol{z}\in \mathbb{R}^m\}</script>，为矩阵<script type="math/tex">D\boldsymbol{h}(\boldsymbol{x}^*)^T</script>的值域。</p>
+</li>
+</ul>
+<p>可以证明，切线空间和法线空间互为正交补。</p>
+<h4 id="4-2-1-一阶必要条件-拉格朗日定理"><a href="#4-2-1-一阶必要条件-拉格朗日定理" class="headerlink" title="4.2.1 一阶必要条件(拉格朗日定理)"></a>4.2.1 一阶必要条件(拉格朗日定理)</h4><p>拉格朗日定理可表述如下：</p>
+<p>若<script type="math/tex">\boldsymbol{x}^*</script>是<script type="math/tex">f:\mathbb{R}^n\to\mathbb{R}</script>的局部极小点(或极大点)，约束条件为<script type="math/tex">\boldsymbol{h}(\boldsymbol{x})=\boldsymbol{0}</script>，<script type="math/tex">\boldsymbol{h}:\mathbb{R}^n\to\mathbb{R}^m,m\le n</script>。如果<script type="math/tex">\boldsymbol{x}^*</script>是正则点，那么存在<script type="math/tex">\boldsymbol{\lambda}^*\in\mathbb{R}^m</script>，使得：</p>
+<p>​                                                             <script type="math/tex">Df(\boldsymbol{x}^*)+{\boldsymbol{\lambda}^*}^TD\boldsymbol{h}(\boldsymbol{x}^*)=\boldsymbol{0}^T</script></p>
+<p>其中：</p>
+<ul>
+<li>第一项中<script type="math/tex">Df(\boldsymbol{x})</script>为函数<script type="math/tex">f</script>的一阶导数：<script type="math/tex">Df=[\frac{\part{f}}{\part{x_1}},\frac{\part{f}}{\part{x_2}},...,\frac{\part{f}}{\part{x_n}}]</script>，刚好为梯度<script type="math/tex">\nabla f(\boldsymbol{x})</script>的转置。</li>
+<li>第二项中<script type="math/tex">D\boldsymbol{h}(\boldsymbol{x})</script>为向量值函数<script type="math/tex">\boldsymbol{h}(\boldsymbol{x})</script>的雅克比矩阵：</li>
+</ul>
+<p>​                                                   <script type="math/tex">D\boldsymbol{h}(\boldsymbol{x})=\begin{bmatrix}Dh_1(\boldsymbol{x})\\ ...\\Dh_m(\boldsymbol{x})\end{bmatrix}=\begin{bmatrix}\nabla h_1(\boldsymbol{x})^T\\ ...\\\nabla h_m(\boldsymbol{x})^T\end{bmatrix}</script></p>
+<p>将上式展开，就会发现：</p>
+<p>​                                               <script type="math/tex">\nabla f(\boldsymbol{x}^*)^T = -\begin{bmatrix} \lambda_1 & ... &\lambda_m \end{bmatrix} \begin{bmatrix}\nabla h_1(\boldsymbol{x}^*)^T\\ ...\\\nabla h_m(\boldsymbol{x}^*)^T\end{bmatrix}</script></p>
+<p>拉格朗日定理表明，如果<script type="math/tex">\boldsymbol{x}^*</script>是极值点，那么目标函数<script type="math/tex">f</script>在该点处梯度可以表示为关于约束函数在该点梯度的线性组合。</p>
+<p>证明是构造性的，证明<script type="math/tex">\nabla f(\boldsymbol{x}^*)</script>位于法线空间中即可。</p>
+<p>为了便于描述，引入拉格朗日函数：<script type="math/tex">l(\boldsymbol{x},\boldsymbol{\lambda})=f(\boldsymbol{x})+\boldsymbol{\lambda}^T\boldsymbol{h}(\boldsymbol{x})</script></p>
+<p>则一阶必要条件可以重新表述为：</p>
+<p>​                                                              <script type="math/tex">D_xl(\boldsymbol{x}^*,\boldsymbol{\lambda}^*)=\boldsymbol{0}^T</script></p>
+<p>​                                                              <script type="math/tex">D_{\lambda}l(\boldsymbol{x}^*,\boldsymbol{\lambda}^*)=\boldsymbol{0}^T</script></p>
+<h4 id="4-2-2-二阶必要条件"><a href="#4-2-2-二阶必要条件" class="headerlink" title="4.2.2 二阶必要条件"></a>4.2.2 二阶必要条件</h4><p>记<script type="math/tex">\boldsymbol{L}(\boldsymbol{x},\boldsymbol{\lambda})</script>是<script type="math/tex">l(\boldsymbol{x},\boldsymbol{\lambda})</script>关于<script type="math/tex">\boldsymbol{x}</script>的Hessian矩阵：</p>
+<p>​                                   <script type="math/tex">\boldsymbol{L}(\boldsymbol{x},\boldsymbol{\lambda})=\nabla^2 f(\boldsymbol{x})+\lambda_1\nabla^2 h_1(\boldsymbol{x})+...+\lambda_m\nabla^2 h_m(\boldsymbol{x})</script></p>
+<p>若<script type="math/tex">\boldsymbol{x}^*</script>是<script type="math/tex">f:\mathbb{R}^n\to\mathbb{R}</script>的局部极小点，且<script type="math/tex">\boldsymbol{x}^*</script>为正则点，则存在<script type="math/tex">\boldsymbol{\lambda}^*\in\mathbb{R}^m</script>，使得：</p>
+<p>1、                                                     <script type="math/tex">Df(\boldsymbol{x}^*)+{\boldsymbol{\lambda}^*}^TD\boldsymbol{h}(\boldsymbol{x}^*)=\boldsymbol{0}^T</script></p>
+<p>2、                                      对于所有<script type="math/tex">\boldsymbol{y}\in T(\boldsymbol{x}^*)</script>，都有<script type="math/tex">\boldsymbol{y}^T\boldsymbol{L}(\boldsymbol{x}^*,\boldsymbol{\lambda}^*)\boldsymbol{y}\ge0</script>                         </p>
+<h4 id="4-2-3-二阶充分条件"><a href="#4-2-3-二阶充分条件" class="headerlink" title="4.2.3 二阶充分条件"></a>4.2.3 二阶充分条件</h4><p>如果存在<script type="math/tex">\boldsymbol{x}^*\in\mathbb{R}^n</script>和<script type="math/tex">\boldsymbol{\lambda}^*\in\mathbb{R}^m</script>，使得：</p>
+<p>1、                                                     <script type="math/tex">Df(\boldsymbol{x}^*)+{\boldsymbol{\lambda}^*}^TD\boldsymbol{h}(\boldsymbol{x}^*)=\boldsymbol{0}^T</script></p>
+<p>2、                                      对于所有<script type="math/tex">\boldsymbol{y}\in T(\boldsymbol{x}^*)</script>，<script type="math/tex">\boldsymbol{y}\ne\boldsymbol{0}</script>，都有<script type="math/tex">\boldsymbol{y}^T\boldsymbol{L}(\boldsymbol{x}^*,\boldsymbol{\lambda}^*)\boldsymbol{y}>0</script>     </p>
+<p>那么<script type="math/tex">\boldsymbol{x}^*</script>是<script type="math/tex">f</script>在约束条件<script type="math/tex">\boldsymbol{h}(\boldsymbol{x})=\boldsymbol{0}</script>下的严格局部极小点。    </p>
+<h3 id="4-3-等式和不等式约束"><a href="#4-3-等式和不等式约束" class="headerlink" title="4.3 等式和不等式约束"></a>4.3 等式和不等式约束</h3><p>本节将研究以下形式约束问题局部极小点对应的条件：</p>
+<p>​                                                                        <script type="math/tex">\min  \ \ \ \ \ \ \ \ f(\boldsymbol{x})
+\\ s.t. \ \ \ \ \boldsymbol{h}(\boldsymbol{x})=\boldsymbol{0}\\ \ \ \ \ \ \ \ \ \ \ \ \boldsymbol{g}(\boldsymbol{x})\le\boldsymbol{0}</script></p>
+<p>在讨论含不等式约束的优化问题时，一个很重要的概念是起作用约束和不起作用约束。若对于一个不等式约束<script type="math/tex">g_j(\boldsymbol{x})\le0</script>，如果在<script type="math/tex">\boldsymbol{x}^*</script>处<script type="math/tex">g_j(\boldsymbol{x^*})=0</script>，那么称该约束是<script type="math/tex">\boldsymbol{x}^*</script>处的起作用约束；如果在<script type="math/tex">\boldsymbol{x}^*</script>处<script type="math/tex">g_j(\boldsymbol{x^*})<0</script>，那么称该约束是<script type="math/tex">\boldsymbol{x}^*</script>处的不起作用约束。</p>
+<p>为了区分起作用约束和不起作用约束，用<script type="math/tex">J(\boldsymbol{x^*})</script>表示起作用不等式约束的下标集：</p>
+<p>​                                                             <script type="math/tex">J(\boldsymbol{x^*})=\{j:g_j(\boldsymbol{x^*})=0\}</script></p>
+<p>同样的，在含不等式约束优化问题中，正则点的概念同样重要。在<script type="math/tex">\boldsymbol{x^*}</script>满足约束的前提下，如果向量集<script type="math/tex">\nabla h_i(\boldsymbol{x^*}),\nabla g_j(\boldsymbol{x^*}),1\le i\le m,j\in J(\boldsymbol{x^*})</script>是线性无关的，那么则称<script type="math/tex">\boldsymbol{x^*}</script>是一个正则点。</p>
+<h4 id="4-3-1-一阶必要条件-KKT条件"><a href="#4-3-1-一阶必要条件-KKT条件" class="headerlink" title="4.3.1 一阶必要条件(KKT条件)"></a>4.3.1 一阶必要条件(KKT条件)</h4><p>若<script type="math/tex">\boldsymbol{x}^*</script>是<script type="math/tex">f:\mathbb{R}^n\to\mathbb{R}</script>的局部极小点，约束条件为<script type="math/tex">\boldsymbol{h}(\boldsymbol{x})=\boldsymbol{0},\boldsymbol{g}(\boldsymbol{x})\le\boldsymbol{0}</script>。如果<script type="math/tex">\boldsymbol{x}^*</script>是正则点，那么存在<script type="math/tex">\boldsymbol{\lambda}^*\in\mathbb{R}^m</script>和<script type="math/tex">\boldsymbol{\mu}^*\in\mathbb{R}^p</script>，使得：</p>
+<p>1、                                                                            <script type="math/tex">\boldsymbol{\mu}^*\ge0</script></p>
+<p>2、                                               <script type="math/tex">Df(\boldsymbol{x}^*)+{\boldsymbol{\lambda}^*}^TD\boldsymbol{h}(\boldsymbol{x}^*)+{\boldsymbol{\mu}^*}^TD\boldsymbol{g}(\boldsymbol{x}^*)=\boldsymbol{0}^T</script></p>
+<p>3、                                                                      <script type="math/tex">{\boldsymbol{\mu}^*}^T\boldsymbol{g}(\boldsymbol{x}^*)=0</script></p>
+<p>上面三个条件被称为KKT条件（Karush-Kuhn-Tucker条件）。</p>
+<h4 id="4-3-2-二阶必要条件"><a href="#4-3-2-二阶必要条件" class="headerlink" title="4.3.2 二阶必要条件"></a>4.3.2 二阶必要条件</h4><p>类似的，定义<script type="math/tex">\boldsymbol{L}(\boldsymbol{x},\boldsymbol{\lambda},\boldsymbol{\mu})</script>：</p>
+<p>​               <script type="math/tex">\boldsymbol{L}(\boldsymbol{x},\boldsymbol{\lambda},\boldsymbol{\mu})=\nabla^2 f(\boldsymbol{x})+\lambda_1\nabla^2 h_1(\boldsymbol{x})+...+\lambda_m\nabla^2 h_m(\boldsymbol{x})+\mu_1\nabla^2 g_1(\boldsymbol{x})+...+\mu_p\nabla^2 g_p(\boldsymbol{x})</script></p>
+<p>并用<script type="math/tex">T(\boldsymbol{x}^*)=\{\boldsymbol{y}\in\mathbb{R}^n:D\boldsymbol{h}(\boldsymbol{x}^*)\boldsymbol{y}=\boldsymbol{0},Dg_j(\boldsymbol{x}^*)\boldsymbol{y}=\boldsymbol{0},j\in J(\boldsymbol{x}^*)\}</script>代表起作用约束所定义曲面的切线空间。</p>
+<p>则二阶必要条件为：</p>
+<p>若<script type="math/tex">\boldsymbol{x}^*</script>是<script type="math/tex">f:\mathbb{R}^n\to\mathbb{R}</script>的局部极小点，且<script type="math/tex">\boldsymbol{x}^*</script>为正则点，则存在<script type="math/tex">\boldsymbol{\lambda}^*\in\mathbb{R}^m，\boldsymbol{\mu}^*\in\mathbb{R}^p</script>，使得：</p>
+<p>1、                             <script type="math/tex">\boldsymbol{\mu}^*\ge0,Df(\boldsymbol{x}^*)+{\boldsymbol{\lambda}^*}^TD\boldsymbol{h}(\boldsymbol{x}^*)+{\boldsymbol{\mu}^*}^TD\boldsymbol{g}(\boldsymbol{x}^*)=\boldsymbol{0}^T,{\boldsymbol{\mu}^*}^T\boldsymbol{g}(\boldsymbol{x}^*)=0</script></p>
+<p>2、                                       对于所有<script type="math/tex">\boldsymbol{y}\in T(\boldsymbol{x}^*)</script>，都有<script type="math/tex">\boldsymbol{y}^T\boldsymbol{L}(\boldsymbol{x}^*,\boldsymbol{\lambda}^*,\boldsymbol{\mu}^*)\boldsymbol{y}\ge0</script>              </p>
+<h4 id="4-3-3-二阶充分条件"><a href="#4-3-3-二阶充分条件" class="headerlink" title="4.3.3 二阶充分条件"></a>4.3.3 二阶充分条件</h4><p>如果<script type="math/tex">\boldsymbol{x}^*\in\mathbb{R}^n</script>是一个可行点，存在<script type="math/tex">\boldsymbol{\lambda}^*\in\mathbb{R}^m</script>和<script type="math/tex">\boldsymbol{\mu}^*\in\mathbb{R}^p</script>，使得：</p>
+<p>1、                             <script type="math/tex">\boldsymbol{\mu}^*\ge0,Df(\boldsymbol{x}^*)+{\boldsymbol{\lambda}^*}^TD\boldsymbol{h}(\boldsymbol{x}^*)+{\boldsymbol{\mu}^*}^TD\boldsymbol{g}(\boldsymbol{x}^*)=\boldsymbol{0}^T,{\boldsymbol{\mu}^*}^T\boldsymbol{g}(\boldsymbol{x}^*)=0</script></p>
+<p>2、                                       对于所有<script type="math/tex">\boldsymbol{y}\in \widetilde{T}(\boldsymbol{x}^*)</script>，<script type="math/tex">\boldsymbol{y}\ne\boldsymbol{0}</script>，都有<script type="math/tex">\boldsymbol{y}^T\boldsymbol{L}(\boldsymbol{x}^*,\boldsymbol{\lambda}^*,\boldsymbol{\mu}^*)\boldsymbol{y}>0</script>             </p>
+<p>那么<script type="math/tex">\boldsymbol{x}^*</script>是<script type="math/tex">f</script>在约束条件<script type="math/tex">\boldsymbol{h}(\boldsymbol{x})=\boldsymbol{0},\boldsymbol{g}(\boldsymbol{x})\le\boldsymbol{0}</script>下的严格局部极小点。   </p>
+<p>其中，<script type="math/tex">\widetilde{T}(\boldsymbol{x}^*)=\{\boldsymbol{y}\in\mathbb{R}^n:D\boldsymbol{h}(\boldsymbol{x}^*)\boldsymbol{y}=\boldsymbol{0},Dg_j(\boldsymbol{x}^*)\boldsymbol{y}=\boldsymbol{0},j\in \widetilde{J}(\boldsymbol{x}^*,\boldsymbol{\mu}^*)\}</script></p>
+<p>上式中，<script type="math/tex">\widetilde{J}(\boldsymbol{x}^*,\boldsymbol{\mu}^*)=\{i:g_i(\boldsymbol{x}^*=0,\mu_i^*>0\}</script></p>
+<h2 id="5-全局性质：凸性Convexity"><a href="#5-全局性质：凸性Convexity" class="headerlink" title="5 全局性质：凸性Convexity"></a><strong>5 全局性质：凸性Convexity</strong></h2><h3 id="5-1-为什么研究凸优化"><a href="#5-1-为什么研究凸优化" class="headerlink" title="5.1 为什么研究凸优化"></a>5.1 为什么研究凸优化</h3><p>在实际中，我们经常会碰到目标函数是凸函数、约束集是凸集的优化问题，这类问题称为凸优化问题或者凸规划。线性规划、二次规划（目标函数为二次型函数、约束方程为线性方程）等实际中大量出现的问题都属于凸优化的范畴。而且凸优化问题有两个很好的性质：</p>
+<ul>
+<li>局部极小点就是全局极小点</li>
+<li>极小点的一阶必要条件同时是凸优化问题的充分条件</li>
+</ul>
+<p>这些性质为求解凸优化问题带来了很大的方便，因此很有必要研究一下凸优化问题。</p>
+<p>下面先来讨论几个很能体现凸优化问题特色的定理：</p>
+<ul>
+<li><p>定理一：已知<script type="math/tex">f:\Omega\to\mathbb{R}</script>是定义在凸集<script type="math/tex">\Omega\subset\mathbb{R}^n</script>上的凸函数，集合<script type="math/tex">\Omega</script>中某一点是<script type="math/tex">f</script>的全局极小点，当且仅当它是<script type="math/tex">f</script>的局部极小点。</p>
+</li>
+<li><p>定理二：如果<script type="math/tex">f:\Omega\to\mathbb{R}</script>是定义在凸集<script type="math/tex">\Omega\subset\mathbb{R}^n</script>上的凸函数，若存在<script type="math/tex">\boldsymbol{x}^*\in\Omega</script>，使得：</p>
+<p>​                                                                       <script type="math/tex">\nabla f(\boldsymbol{x}^*)=\boldsymbol{0}</script></p>
+<p>则<script type="math/tex">\boldsymbol{x}^*</script>是<script type="math/tex">f</script>在<script type="math/tex">\Omega</script>上的全局极小点。这说明集合约束对应的凸优化问题中一阶必要条件就是全局极小的充分条件。</p>
+</li>
+<li><p>定理三：如果<script type="math/tex">f:\Omega\to\mathbb{R}</script>是定义在凸集<script type="math/tex">\Omega=\{\boldsymbol{x}\in \mathbb{R}^n,\boldsymbol{h}(\boldsymbol{x})=\boldsymbol{0}\}</script>上的凸函数，且<script type="math/tex">\Omega</script>是凸集。假设存在<script type="math/tex">\boldsymbol{\lambda}^*\in\mathbb{R}^m</script>，使得：</p>
+<p>​                                                             <script type="math/tex">Df(\boldsymbol{x}^*)+{\boldsymbol{\lambda}^*}^TD\boldsymbol{h}(\boldsymbol{x}^*)=\boldsymbol{0}^T</script></p>
+<p>则<script type="math/tex">\boldsymbol{x}^*</script>是<script type="math/tex">f</script>在<script type="math/tex">\Omega</script>上的全局极小点。这说明等式约束对应的凸优化问题中拉格朗日条件就是全局极小的充分条件。</p>
+</li>
+<li><p>定理四：如果<script type="math/tex">f:\Omega\to\mathbb{R}</script>是定义在凸集<script type="math/tex">\Omega=\{\boldsymbol{x}\in \mathbb{R}^n,\boldsymbol{h}(\boldsymbol{x})=\boldsymbol{0},\boldsymbol{g}(\boldsymbol{x})\le\boldsymbol{0}\}</script>上的凸函数，且<script type="math/tex">\Omega</script>是凸集。假设存在<script type="math/tex">\boldsymbol{\lambda}^*\in\mathbb{R}^m</script>和<script type="math/tex">\boldsymbol{\mu}^*\in\mathbb{R}^p</script>，使得：</p>
+<p>​                                                                              <script type="math/tex">\boldsymbol{\mu}^*\ge0</script></p>
+<p>​                                              <script type="math/tex">Df(\boldsymbol{x}^*)+{\boldsymbol{\lambda}^*}^TD\boldsymbol{h}(\boldsymbol{x}^*)+{\boldsymbol{\mu}^*}^TD\boldsymbol{g}(\boldsymbol{x}^*)=\boldsymbol{0}^T</script></p>
+<p>​                                                                         <script type="math/tex">{\boldsymbol{\mu}^*}^T\boldsymbol{g}(\boldsymbol{x}^*)=0</script></p>
+<p>则<script type="math/tex">\boldsymbol{x}^*</script>是<script type="math/tex">f</script>在<script type="math/tex">\Omega</script>上的全局极小点。这说明不等式约束对应的凸优化问题中KKT条件就是全局极小的充分条件。</p>
+</li>
+</ul>
+<h3 id="5-2-基本定义与性质"><a href="#5-2-基本定义与性质" class="headerlink" title="5.2 基本定义与性质"></a>5.2 基本定义与性质</h3><p>几个基本的定义如下：</p>
+<ul>
+<li><p>凸集：若对于所有的<script type="math/tex">\boldsymbol{u},\boldsymbol{v}\in\Theta</script>，<script type="math/tex">\boldsymbol{u}</script>和<script type="math/tex">\boldsymbol{v}</script>之间的线段<script type="math/tex">\alpha\boldsymbol{u}+(1-\alpha)\boldsymbol{v},\alpha\in[0,1]</script>都位于<script type="math/tex">\Theta</script>内，称<script type="math/tex">\Theta\in\mathbb{R}^n</script>为凸集。</p>
+</li>
+<li><p>凸函数：对于定义在凸集<script type="math/tex">\Omega\in\mathbb{R}^n</script>上的函数<script type="math/tex">f:\Omega\to\mathbb{R}</script>，则函数<script type="math/tex">f</script>是凸函数当且仅当对于任意<script type="math/tex">\boldsymbol{x},\boldsymbol{y}\in\Omega,\boldsymbol{x}\ne\boldsymbol{y}</script>和<script type="math/tex">\alpha\in(0,1)</script>，都有：</p>
+<p>​                                                    <script type="math/tex">f(\alpha\boldsymbol{x}+(1-\alpha)\boldsymbol{y})\le \alpha f(\boldsymbol{x})+(1-\alpha)f(\boldsymbol{y})</script></p>
+<p>​               </p>
+</li>
+</ul>
+<p>凸函数比较重要的性质总结如下：</p>
+<ul>
+<li>若干凸函数的线性组合还是凸函数。</li>
+<li>凸函数的定义域必为凸集。</li>
+<li>函数<script type="math/tex">f</script>是凸函数当且仅当对于任意<script type="math/tex">\boldsymbol{x},\boldsymbol{y}\in\Omega</script>，有<script type="math/tex">f(\boldsymbol{y})\ge f(\boldsymbol{x})+Df(\boldsymbol{x})(\boldsymbol{y}-\boldsymbol{x})</script>。几何意义为凸函数的图像总是在其线性近似函数的上方。</li>
+<li>二次型函数<script type="math/tex">f(\boldsymbol{x})=\boldsymbol{x}^TQ\boldsymbol{x},Q=Q^T</script>是凸函数当且仅当矩阵<script type="math/tex">Q</script>半正定。</li>
+<li>函数<script type="math/tex">f</script>是凸函数当且仅当<script type="math/tex">f</script>的Hessian矩阵半正定，即<script type="math/tex">\nabla^2 f(\boldsymbol{x}^*)\ge0</script>。</li>
+</ul>
+<h3 id="5-3-半定规划"><a href="#5-3-半定规划" class="headerlink" title="5.3 半定规划"></a>5.3 半定规划</h3><p>半定规划是凸优化的一个分支，求解的是线性矩阵不等式约束下的线性目标函数的极小值。线性矩阵不等式约束定义了一个凸集，要求在该可行集上使得目标函数达到极小值。</p>
+<h2 id="6-确定步长：一维搜索方法"><a href="#6-确定步长：一维搜索方法" class="headerlink" title="6 确定步长：一维搜索方法"></a><strong>6 确定步长：一维搜索方法</strong></h2><h3 id="6-1-why-Line-Search？"><a href="#6-1-why-Line-Search？" class="headerlink" title="6.1 why Line Search？"></a>6.1 why Line Search？</h3><p>在上面我们提到，非线性规划中每一步迭代都使用如下的公式确定每一次迭代的方向和步长：</p>
+<p>​                                                                   <script type="math/tex">\boldsymbol{x}^{(k+1)}=\boldsymbol{x}^{(k)}+t_k\boldsymbol{p}^{(k)}</script></p>
+<p>其中<script type="math/tex">\boldsymbol{p}^{(k)}</script>为搜索方向，是下一大节主要讨论的问题，在这里我们认为每一次迭代的搜索方向<script type="math/tex">\boldsymbol{p}^{(k)}</script>是已知的。在每一次迭代的过程中，我们肯定都希望结果相较前一次有所改善，也就是希望每一次迭代都能使目标函数值有所下降，即<script type="math/tex">f(\boldsymbol{x}^{(k+1)})<f(\boldsymbol{x}^{(k)})</script>，甚至是下降的最多。而我们现在唯一可以调整的参量就是搜索步长<script type="math/tex">t_k</script>，在<script type="math/tex">\boldsymbol{p}^{(k)}</script>和<script type="math/tex">\boldsymbol{x}^{(k)}</script>都确定的情况下，<script type="math/tex">f(\boldsymbol{x}^{(k+1)})</script>只与<script type="math/tex">t_k</script>的取值有关，是关于<script type="math/tex">t_k</script>的一元函数。一个很直观的想法就是找出使得<script type="math/tex">f(\boldsymbol{x}^{(k+1)})</script>最小的<script type="math/tex">t_k</script>，即：</p>
+<p>​                                                             <script type="math/tex">t_k=\underset{t_k>0}{argmin}\ \ f(\boldsymbol{x}^{(k)}+t_k\boldsymbol{p}^{(k)})</script></p>
+<p>一维搜索方法的主要目的就是：</p>
+<p>找到使得<script type="math/tex">f(\boldsymbol{x}^{(k+1)})=f(\boldsymbol{x}^{(k)}+t_k\boldsymbol{p}^{(k)})=\phi(t_k)</script>有所下降甚至是取极小值的<script type="math/tex">t_k</script>，进而确定每一次迭代步长。</p>
+<h3 id="6-2-六点说明"><a href="#6-2-六点说明" class="headerlink" title="6.2 六点说明"></a>6.2 六点说明</h3><ol>
+<li><p>适用范围：一维搜索问题可用于解决一元函数极小化和非线性规划中每一次迭代步长的确定。</p>
+</li>
+<li><p>一维搜索方法及本质：</p>
+<ul>
+<li>仍具有一般非线性规划问题的结构，因为需要极小化的函数<script type="math/tex">f(\boldsymbol{x}^{(k)}+t_k\boldsymbol{p}^{(k)})</script>大部分是非线性的</li>
+<li>非线性规划的迭代下降算法本质是把<script type="math/tex">n</script>维问题化为一系列一维问题</li>
+<li>一维搜索问题仍采用迭代(下降)算法</li>
+<li>搜索方向可正可负，产生一系列试探点列：<script type="math/tex">t_0,t_1,...,t_K</script></li>
+</ul>
+</li>
+<li><p>几个概念：</p>
+<ul>
+<li><p>全局最优解、局部最优解、满意解：字面意思</p>
+</li>
+<li><p>单谷函数：区间<script type="math/tex">[a,b]</script>的单谷函数<script type="math/tex">\phi(t)</script>：<script type="math/tex">\exist\ t^*\in[a,b]</script>，使<script type="math/tex">\phi(t)</script>在<script type="math/tex">[a,t^*]</script>严格递减，且在<script type="math/tex">[t^*,b]</script>严格递增。</p>
+<p>​                    注意单谷函数与凸函数不同。</p>
+</li>
+</ul>
+</li>
+<li><p>精确一维搜索与非精确一维搜索：</p>
+<ul>
+<li>精确一维搜索：试探点列<script type="math/tex">\{t_l\}_{l=0}^{+\infty}</script>满足<script type="math/tex">\underset{l\to\infty}{\lim}t_l=t^*</script>，即试探点列最终能精确的收敛到极小点。</li>
+<li>非精确一维搜索：不能保证试探点列收敛到任一局部极小点，但可以给出使<script type="math/tex">\phi(t)</script>下降的<script type="math/tex">t</script>的合理区间。</li>
+<li>在实际应用中都是仅执行有限步试探，因为有限的算力应该更多的分配在寻找搜索方向上。</li>
+</ul>
+</li>
+<li><p>划界问题：如何确定搜索区间，即确定<script type="math/tex">[a,b]</script>或<script type="math/tex">t_{max}</script>。</p>
+</li>
+<li><p>常用的一维搜索算法总结：</p>
+</li>
+</ol>
+<div class="table-container">
+<table>
+<thead>
+<tr>
+<th style="text-align:center"></th>
+<th style="text-align:center">用导数</th>
+<th style="text-align:center">不用导数</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">精确搜索</td>
+<td style="text-align:center">插值法</td>
+<td style="text-align:center">Fibonacci搜索(只使用目标函数值)</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center">二分法(只使用目标函数一阶导数)</td>
+<td style="text-align:center">黄金分割法(只使用目标函数值)</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center">Newton法(使用目标函数一阶导数和二阶导数)</td>
+<td style="text-align:center"></td>
+</tr>
+<tr>
+<td style="text-align:center">非精确搜索</td>
+<td style="text-align:center">Goldstein法</td>
+<td style="text-align:center">Goldstein法</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center">Armijo法</td>
+<td style="text-align:center">Armijo法</td>
+</tr>
+<tr>
+<td style="text-align:center"></td>
+<td style="text-align:center">Wolfe法</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h3 id="6-3-精确一维搜索"><a href="#6-3-精确一维搜索" class="headerlink" title="6.3 精确一维搜索"></a>6.3 精确一维搜索</h3><h3 id="6-4-非精确一维搜索"><a href="#6-4-非精确一维搜索" class="headerlink" title="6.4 非精确一维搜索"></a>6.4 非精确一维搜索</h3><h2 id="7-搜索方向"><a href="#7-搜索方向" class="headerlink" title="7 搜索方向"></a><strong>7 搜索方向</strong></h2><h3 id="7-1-无约束优化"><a href="#7-1-无约束优化" class="headerlink" title="7.1 无约束优化"></a>7.1 无约束优化</h3><h4 id="7-1-1-梯度方法"><a href="#7-1-1-梯度方法" class="headerlink" title="7.1.1 梯度方法"></a>7.1.1 梯度方法</h4><h4 id="7-1-2-牛顿法"><a href="#7-1-2-牛顿法" class="headerlink" title="7.1.2 牛顿法"></a>7.1.2 牛顿法</h4><h4 id="7-1-3-共轭方向法"><a href="#7-1-3-共轭方向法" class="headerlink" title="7.1.3 共轭方向法"></a>7.1.3 共轭方向法</h4><h4 id="7-1-4-拟牛顿法"><a href="#7-1-4-拟牛顿法" class="headerlink" title="7.1.4 拟牛顿法"></a>7.1.4 拟牛顿法</h4><h3 id="7-2-约束优化"><a href="#7-2-约束优化" class="headerlink" title="7.2 约束优化"></a>7.2 约束优化</h3><h4 id="7-2-1-投影方向法"><a href="#7-2-1-投影方向法" class="headerlink" title="7.2.1 投影方向法"></a>7.2.1 投影方向法</h4><h4 id="7-2-2-拉格朗日法"><a href="#7-2-2-拉格朗日法" class="headerlink" title="7.2.2 拉格朗日法"></a>7.2.2 拉格朗日法</h4><h4 id="7-2-3-罚函数法"><a href="#7-2-3-罚函数法" class="headerlink" title="7.2.3 罚函数法"></a>7.2.3 罚函数法</h4><h2 id="8-初始点的选取"><a href="#8-初始点的选取" class="headerlink" title="8 初始点的选取"></a><strong>8 初始点的选取</strong></h2><h2 id="9-终止准则"><a href="#9-终止准则" class="headerlink" title="9 终止准则"></a><strong>9 终止准则</strong></h2><h2 id="10-参考资料"><a href="#10-参考资料" class="headerlink" title="10 参考资料"></a>10 参考资料</h2>
+
+  
+</article>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

@@ -1,0 +1,598 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/browser_tab.jpeg">
+  <link rel="icon" href="/img/browser_tab.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="在Robomaster研究控制时，将LQR最优控制算法在英雄机器人云台上实现了一下">
+  <meta name="author" content="lqx">
+  <meta name="keywords" content="">
+  <meta name="description" content="在Robomaster研究控制时，将LQR最优控制算法在英雄机器人云台上实现了一下">
+<meta property="og:type" content="article">
+<meta property="og:title" content="LQR最优控制在电机控制方面的实际应用">
+<meta property="og:url" content="http://example.com/2021/12/01/%E5%85%A8%E7%8A%B6%E6%80%81%E5%8F%8D%E9%A6%88%E6%8E%A7%E5%88%B6%E7%8E%87LQR%E5%9C%A8%E7%94%B5%E6%9C%BA%E6%8E%A7%E5%88%B6%E6%96%B9%E9%9D%A2%E7%9A%84%E5%AE%9E%E9%99%85%E5%BA%94%E7%94%A8/index.html">
+<meta property="og:site_name" content="Robotics and Astronomy by lqx">
+<meta property="og:description" content="在Robomaster研究控制时，将LQR最优控制算法在英雄机器人云台上实现了一下">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/img/LQR_3508/statefeedback_pend2.png">
+<meta property="og:image" content="http://example.com/img/LQR_3508/Q1-K.svg">
+<meta property="og:image" content="http://example.com/img/LQR_3508/Q1-step.svg">
+<meta property="og:image" content="http://example.com/img/LQR_3508/Q2-K.svg">
+<meta property="og:image" content="http://example.com/img/LQR_3508/Q2-step.svg">
+<meta property="og:image" content="http://example.com/img/LQR_3508/R-K.svg">
+<meta property="og:image" content="http://example.com/img/LQR_3508/R-step.svg">
+<meta property="og:image" content="http://example.com/img/LQR_3508/k1_0.5,k2_10.svg">
+<meta property="og:image" content="http://example.com/img/LQR_3508/k1_1,k2_10.svg">
+<meta property="og:image" content="http://example.com/img/LQR_3508/k1_2,k2_10.svg">
+<meta property="og:image" content="http://example.com/img/LQR_3508/k1_3,k2_10.svg">
+<meta property="og:image" content="http://example.com/img/LQR_3508/k1_2.5,k2_2.5.svg">
+<meta property="og:image" content="http://example.com/img/LQR_3508/k1_2.5,k2_5.svg">
+<meta property="og:image" content="http://example.com/img/LQR_3508/k1_2.5,k2_7.5.svg">
+<meta property="og:image" content="http://example.com/img/LQR_3508/k1_2.5,k2_10.svg">
+<meta property="og:image" content="http://example.com/img/LQR_3508/PIDvsLQR，sl76.svg">
+<meta property="og:image" content="http://example.com/img/LQR_3508/PID&amp;LQRin1.svg">
+<meta property="article:published_time" content="2021-12-01T01:17:39.772Z">
+<meta property="article:modified_time" content="2021-12-10T15:41:49.425Z">
+<meta property="article:author" content="lqx">
+<meta property="article:tag" content="Control">
+<meta property="article:tag" content="Optimal Control">
+<meta property="article:tag" content="Algorithum">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/LQR_3508/statefeedback_pend2.png">
+  
+  <title>LQR最优控制在电机控制方面的实际应用 - Robotics and Astronomy by lqx</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.12","typing":{"enable":false,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>DK-L</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/LQR_3508/Modern_control_system.jpeg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="LQR最优控制在电机控制方面的实际应用">
+              
+                LQR最优控制在电机控制方面的实际应用
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-12-01 09:17" pubdate>
+        December 1, 2021 am
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      6.4k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      20 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">LQR最优控制在电机控制方面的实际应用</h1>
+            
+            <div class="markdown-body">
+              <h2 id="1-基本思想"><a href="#1-基本思想" class="headerlink" title="1 基本思想"></a>1 基本思想</h2><h3 id="1-1-系统框图"><a href="#1-1-系统框图" class="headerlink" title="1.1 系统框图"></a>1.1 系统框图</h3><p><img src="/img/LQR_3508/statefeedback_pend2.png" srcset="/img/loading.gif" lazyload alt="statefeedback_pend2"></p>
+<p>上图中，<script type="math/tex">r</script>是参考输入，<script type="math/tex">u</script>是系统输入，<script type="math/tex">\boldsymbol{x}</script>是状态变量组成的向量，<script type="math/tex">y</script>为系统输出。</p>
+<p>对应到电机位置控制中，<script type="math/tex">r</script>参考输入，代表的是电机的期望位置，即我们希望电机到达的位置。<script type="math/tex">u</script>为系统输入，即电机的电流或电压，通过系统输入我们驱动电机的运动。<script type="math/tex">\boldsymbol{x}</script>状态变量，我们选择电机角度位置和电机角速度作为两个状态变量。<script type="math/tex">y</script>系统输出，可以将电机的实际位置作为系统输出。</p>
+<h3 id="1-2-系统方程"><a href="#1-2-系统方程" class="headerlink" title="1.2 系统方程"></a>1.2 系统方程</h3><p>对于一个一般的系统，我们通常用两组方程来描述：</p>
+<ul>
+<li>状态微分方程：       $$\dot{\boldsymbol{x}}=\boldsymbol{Ax+Bu}$$  </li>
+</ul>
+<ul>
+<li>输出方程：              $$\boldsymbol{y=Cx+Du}$$</li>
+</ul>
+<p>在设计全状态反馈控制律时，我们利用全部的状态变量并结合参考输入来得到系统输入，</p>
+<p>即系统输入由下式构成：                              $$u=\boldsymbol{-Kx}+Nr$$</p>
+<p>在具体的电机位置控制问题中，状态变量<script type="math/tex">\boldsymbol{x}</script>由位置和速度一同构成，参考输入<script type="math/tex">r</script>即为我们期望电机到达的位置，系统输入<script type="math/tex">u</script>是电机电压或电流。与PID不同，PID先通过位置的误差计算出期望的速度，在通过速度的误差计算出期望的电流。而基于状态空间的全状态反馈控制设计则直接由期望位置、实际位置和实际速度一同确定电机的期望电流值，注意电机的期望速度是0，这是由问题的调节器本质决定的(即系统只能让一个状态变量跟踪一个参考输入信号，其余状态变量趋于0)。</p>
+<p>问题的关键在于确定上式中的反馈增益<script type="math/tex">\boldsymbol{K}</script>，有很多种方法，比如说先确定闭环系统的特征根进而确定增益，再比如说根据经验和时域相应调节，最后也可以利用LQR设计最优控制系统得到<script type="math/tex">\boldsymbol{K}</script>。得到增益<script type="math/tex">\boldsymbol{K}</script>之后，参考输入前的系数<script type="math/tex">N</script>可以很方便的确定。整个系统的设计就完成了。</p>
+<p>关于LQR(Linear Quadratic Regulatory，线性二次调节器)，说明如下：</p>
+<p>针对未校正的单输入-单输出系统：                       $$\dot{\boldsymbol{x}}=\boldsymbol{Ax+B}u$$</p>
+<p>状态反馈控制信号为：                          $$u=-\boldsymbol{Kx}=-\begin{pmatrix}k_1 & k_2 & ... &k_n\end{pmatrix}\boldsymbol{x}$$</p>
+<p>定义综合性能指标为：                               $$J=\int_{0}^{\infty } (\boldsymbol{x^TQx}+Ru^2)dt$$</p>
+<p>LQR通过确定合适的反馈增益<script type="math/tex">\boldsymbol{K}</script>，使得上面定义的综合性能指标最小。通过综合考虑状态变量的误差以及系统的输入消耗，设计出最优的控制系统。</p>
+<h3 id="1-3-电机位置控制方程"><a href="#1-3-电机位置控制方程" class="headerlink" title="1.3 电机位置控制方程"></a>1.3 电机位置控制方程</h3><p>具体到电机位置控制的问题，我们选择电机位置<script type="math/tex">\theta</script>和电机角速度<script type="math/tex">\dot{\theta}</script>作为状态变量，电机电流<script type="math/tex">i</script>(大疆3508电机)或者电机电压<script type="math/tex">u</script>(大疆6020电机)作为系统输入，期望电机位置为参考输入<script type="math/tex">r</script>。</p>
+<p>由动力学方程：                                          $$J\ddot{\theta}(t)+b\dot{\theta}(t)=k_mi(t)$$</p>
+<p>上式中<script type="math/tex">J</script>为系统的转动惯量，<script type="math/tex">b</script>为系统的摩擦阻尼系数，<script type="math/tex">k_m</script>为电机的转矩常数。</p>
+<p>可得系统的状态微分方程为：</p>
+<p>​                                                        $$\begin{pmatrix}\dot{\theta} \\ \ddot{\theta} \end{pmatrix}=\begin{pmatrix}0&1 \\ 0&-b/J \end{pmatrix}\begin{pmatrix}\theta \\ \dot{\theta} \end{pmatrix}+\begin{pmatrix}0 \\ k_m/J \end{pmatrix} i$$</p>
+<p>即：                                                        $$A=\begin{pmatrix}0&1 \\ 0&-b/J \end{pmatrix}$$ </p>
+<p>以及：$$B=\begin{pmatrix}0 \\ k_m/J \end{pmatrix}$$</p>
+<p>若采用LQR设计全状态反馈控制，则综合性能指标为：$$J=\int_{0}^{\infty } \{\quad \boldsymbol{\begin{pmatrix}\dot{\theta} & \ddot{\theta} \end{pmatrix}\begin{pmatrix}Q_1 &0 \\ 0 & Q_2 \end{pmatrix}\begin{pmatrix}\dot{\theta} \\ \ddot{\theta} \end{pmatrix}}+R\times i^2\quad \}dt$$</p>
+<p>可以看出，<script type="math/tex">Q_1</script>的大小代表了位置误差所占的权重，<script type="math/tex">Q_2</script>的大小代表了速度误差所占的权重，<script type="math/tex">R</script>的大小代表了输入消耗的能量所占的权重。</p>
+<p>可以预料到，<script type="math/tex">Q_1</script>越大，位置误差在性能函数中所占的权重越大，反馈矩阵<script type="math/tex">\boldsymbol{K}</script>中的<script type="math/tex">k_1</script>也应该越大，表示了位置误差对于输出电流的影响越大，系统更加倾向于减小最终的位置误差。同理，<script type="math/tex">Q_2</script>越大，速度误差在性能函数中所占的权重越大，反馈矩阵<script type="math/tex">\boldsymbol{K}</script>中的<script type="math/tex">k_2</script>也应该越大，表示了速度误差对于输出电流的影响越大，系统更加倾向于快速使最终的速度收敛到0，即减少系统的震荡。</p>
+<p>我们可以从<strong>直观上</strong>理解一下为什么全状态反馈控制能够工作：</p>
+<p>控制方程可以写作：<script type="math/tex">u=-\boldsymbol{Kx}+Nr</script>，本问题中<script type="math/tex">N=k_1</script>，即控制方程可以化为：</p>
+<p>​                                   $$u=-k_1\times \theta-k_2\times \dot{\theta}+k_1\times\theta_{set} =k_1\times(\theta_{set}-\theta)+k_2\times \dot{\theta}=i$$</p>
+<p>即：                                                    $$i=k_1\times(\theta_{set}-\theta)+k_2\times \dot{\theta}$$</p>
+<p>当角度没有到达预定角度时，上式中的第一项不为0，电流较大，驱动电机到达预定位置，当电机到达预定位置附近时，第一项较小，但电机较快的速度导致第二项较大，产生电流使得电机减速，从而在预定位置处速度为0，电机稳定的到达预定位置。直观上看，<script type="math/tex">k_1</script>越大，电机会较快的到达预定位置，但可能伴随着较大的超调和震荡，此时可以增加<script type="math/tex">k_2</script>的值，使得速度迅速衰减为0，到达抑制震荡的效果。</p>
+<h3 id="1-4-基础代码"><a href="#1-4-基础代码" class="headerlink" title="1.4 基础代码"></a>1.4 基础代码</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-comment">//LQR计算	 </span><br>	 Motor.LQR.out = Motor.LQR.K_total*(<br>	                -Motor.LQR.K_location*Motor.Location.Location<br>	                -Motor.LQR.K_speed*Motor.Speed.Speed<br>				    +Motor.LQR.K_location*Motor.Location.SetLocation);<br>     <span class="hljs-keyword">if</span>(Motor.LQR.out &gt; <span class="hljs-number">1</span>) Motor.LQR.out = <span class="hljs-number">1</span>;<br>     <span class="hljs-keyword">else</span> <span class="hljs-keyword">if</span>(Motor.LQR.out &lt; <span class="hljs-number">-1</span>) Motor.LQR.out = <span class="hljs-number">-1</span>;	 <br>	 Can1SendMessege[<span class="hljs-number">0</span>]	=	((<span class="hljs-keyword">int16_t</span>)(Motor.LQR.out*<span class="hljs-number">16000</span>))&gt;&gt;<span class="hljs-number">8</span>;<br>	 Can1SendMessege[<span class="hljs-number">1</span>]	=	((<span class="hljs-keyword">int16_t</span>)(Motor.LQR.out*<span class="hljs-number">16000</span>))&amp;<span class="hljs-number">0x00ff</span>;	 <br>	 CAN1_Send_Msg(Can1SendMessege,<span class="hljs-number">8</span>);<br></code></pre></td></tr></table></figure>
+<p>思想很简单，就是上面公式<script type="math/tex">i=k_1\times(\theta_{set}-\theta)+k_2\times \dot{\theta}</script>的直接应用。实践中，可以通过<script type="math/tex">K_{location}</script>和<script type="math/tex">K_{speed}</script>调节位置误差和速度误差所占比例的权重，再通过调节<script type="math/tex">K_{total}</script>使得响应速度和稳态误差达到一个满意的水平。不知为何，matlab中利用LQR进行计算只能得到一个较为满意的<script type="math/tex">K_{location}</script>和<script type="math/tex">K_{speed}</script>的比值，最后还需要调节<script type="math/tex">K_{total}</script>才能让系统最终工作。如果直接手动整定参数，可以不用管<script type="math/tex">K_{total}</script>，直接调节<script type="math/tex">K_{location}</script>和<script type="math/tex">K_{speed}</script>即可(数据归一化会使调节变得方便)。</p>
+<h2 id="2-仿真效果"><a href="#2-仿真效果" class="headerlink" title="2 仿真效果"></a>2 仿真效果</h2><h3 id="2-1-仿真代码"><a href="#2-1-仿真代码" class="headerlink" title="2.1 仿真代码"></a>2.1 仿真代码</h3><p>matlab仿真代码如下：</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><code class="hljs matlab"><span class="hljs-comment">%%构建系统状态空间方程</span><br>A=[<span class="hljs-number">0</span> <span class="hljs-number">1</span>;<span class="hljs-number">0</span> <span class="hljs-number">-0.0013</span>];<br>B=[<span class="hljs-number">0</span>;<span class="hljs-number">13.5</span>];<br><span class="hljs-comment">%此处按照y=r构建，r即参考输入为位置</span><br>C=[<span class="hljs-number">1</span> <span class="hljs-number">0</span>];<br>D=[<span class="hljs-number">0</span>];<br>sys_ss = ss(A,B,C,D);<br><span class="hljs-comment">%%计算LQR得到的反馈矩阵K</span><br>Q=[<span class="hljs-number">10</span> <span class="hljs-number">0</span>;<span class="hljs-number">0</span> <span class="hljs-number">1</span>];<br>R=<span class="hljs-number">1</span>;<br>K=lqr(A,B,Q,R)<br><span class="hljs-comment">%%计算跟踪参考输入所需要的系数</span><br>T=[A B;C D];<br>T_inv = inv(T);<br>N=T_inv*[<span class="hljs-number">0</span>;<span class="hljs-number">0</span>;<span class="hljs-number">1</span>];<br>Nbar=K*[<span class="hljs-number">1</span>;<span class="hljs-number">0</span>];<br><span class="hljs-comment">%%仿真闭环系统的阶跃响应</span><br>Ac = [(A-B*K)];<br>Bc = [B];<br>Cc = [C];<br>Dc = [D];<br>sys_cl = ss(Ac,Bc*Nbar,Cc,Dc);<br>step(sys_cl)<br></code></pre></td></tr></table></figure>
+<p>这个状态空间方程不一定完全准确，但和实际值应该差不多。通过对于不同<script type="math/tex">Q</script>和<script type="math/tex">R</script>的值的仿真，我们可以得到一些经验，并看到<script type="math/tex">Q</script>和<script type="math/tex">R</script>的值对于系统时域阶跃响应的影响非常直观且符合直觉。</p>
+<h3 id="2-2-Q的值对于K和阶跃响应的影响"><a href="#2-2-Q的值对于K和阶跃响应的影响" class="headerlink" title="2.2 Q的值对于K和阶跃响应的影响"></a>2.2 <script type="math/tex">Q</script>的值对于<script type="math/tex">K</script>和阶跃响应的影响</h3><h4 id="2-2-1-Q-1的影响"><a href="#2-2-1-Q-1的影响" class="headerlink" title="2.2.1 Q_1的影响"></a>2.2.1 <script type="math/tex">Q_1</script>的影响</h4><p>不同<script type="math/tex">Q_1</script>对应的<script type="math/tex">K_1</script>和<script type="math/tex">K_2</script>：</p>
+<p><img src="/img/LQR_3508/Q1-K.svg" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>不同<script type="math/tex">Q_1</script>对应的阶跃响应：</p>
+<p><img src="/img/LQR_3508/Q1-step.svg" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>可以看到，随着<script type="math/tex">Q_1</script>的不断增大，位置误差在性能函数中的占比也不断增大，导致位置误差在最终的系统输入中占比也越来越大，直接结果就是<script type="math/tex">K_1</script>随着<script type="math/tex">Q_1</script>的增大明显增大，而<script type="math/tex">K_2</script>仅仅是微微增大。同样的，随着<script type="math/tex">Q_1</script>的增大，位置误差更倾向于快速减小，表现在系统的阶跃响应上就是系统的上升时间明显减小。</p>
+<h4 id="2-2-2-Q-2的影响"><a href="#2-2-2-Q-2的影响" class="headerlink" title="2.2.2 Q_2的影响"></a>2.2.2 <script type="math/tex">Q_2</script>的影响</h4><p>不同<script type="math/tex">Q_2</script>对应的<script type="math/tex">K_1</script>和<script type="math/tex">K_2</script>：</p>
+<p><img src="/img/LQR_3508/Q2-K.svg" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>不同<script type="math/tex">Q_2</script>对应的阶跃响应：</p>
+<p><img src="/img/LQR_3508/Q2-step.svg" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>可以看到，随着<script type="math/tex">Q_2</script>的不断增大，速度误差在性能函数中的占比也不断增大，导致速度误差在最终的系统输入中占比也越来越大，直接结果就是<script type="math/tex">K_2</script>随着<script type="math/tex">Q_2</script>的增大明显增大，而<script type="math/tex">K_1</script>的大小则变化不大。同样的，随着<script type="math/tex">Q_2</script>的增大，速度误差更倾向于快速的缩小，电机更倾向于以更小的速度运行，导致系统阶跃响应变慢，但好处就是系统阶跃响应的超调得到了抑制。</p>
+<h3 id="2-3-R的值对于K和阶跃响应的影响"><a href="#2-3-R的值对于K和阶跃响应的影响" class="headerlink" title="2.3 R的值对于K和阶跃响应的影响"></a>2.3 <script type="math/tex">R</script>的值对于<script type="math/tex">K</script>和阶跃响应的影响</h3><p>不同<script type="math/tex">R</script>对应的<script type="math/tex">K_1</script>和<script type="math/tex">K_2</script>：</p>
+<p><img src="/img/LQR_3508/R-K.svg" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>不同<script type="math/tex">R</script>对应的阶跃响应：</p>
+<p><img src="/img/LQR_3508/R-step.svg" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>可以看到，随着<script type="math/tex">R</script>的不断增大，系统倾向于以耗能更小的方式运行，则<script type="math/tex">K_1</script>和<script type="math/tex">K_2</script>都随着<script type="math/tex">R</script>的增大而减小，且系统的阶跃响应随着<script type="math/tex">R</script>的增大而变慢，系统的耗能减少。</p>
+<h2 id="3-电机实际测试结果"><a href="#3-电机实际测试结果" class="headerlink" title="3 电机实际测试结果"></a>3 电机实际测试结果</h2><p>单电机测试选用大疆3508电机进行测试。<strong>本小节所有数据皆为实测</strong>。</p>
+<h3 id="3-1-基于经验和时域波形的调参"><a href="#3-1-基于经验和时域波形的调参" class="headerlink" title="3.1 基于经验和时域波形的调参"></a>3.1 基于经验和时域波形的调参</h3><p>严格来说，本小节中的内容并不能叫LQR控制，因为反馈增益矩阵是<script type="math/tex">K</script>根据经验和时域响应确定的，并不一定是根据模型得到的最优控制的解。本小节的内容叫手动调参的全状态反馈控制率设计更为合适。但在下文中，为了方便，大部分时间仍把这种方法叫做LQR。</p>
+<h4 id="3-1-1-k-1-K-location-大小对于最终效果的影响"><a href="#3-1-1-k-1-K-location-大小对于最终效果的影响" class="headerlink" title="3.1.1 k_1(K_{location})大小对于最终效果的影响"></a>3.1.1 <script type="math/tex">k_1</script>(<script type="math/tex">K_{location}</script>)大小对于最终效果的影响</h4><p>在本小节中，我们固定<script type="math/tex">k_2</script>不变，仅改变<script type="math/tex">k_1</script>的值，测量电机的阶跃响应。所有位置数据和速度数据均已进行过归一化。在J-scope中读出实际位置和实际速度的数据，在matlab中绘制图像。<strong>本小节所有数据皆为实测</strong>。</p>
+<p>不同参数下电机的阶跃响应如下图所示，左侧为位置随时间变化的曲线，右侧为速度随时间变化的曲线。</p>
+<p>1、<script type="math/tex">k_1=0.5   \qquad  k_2=10</script>   ：</p>
+<p><img src="/img/LQR_3508/k1_0.5,k2_10.svg" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>2、<script type="math/tex">k_1=1   \qquad  k_2=10</script>   ：</p>
+<p><img src="/img/LQR_3508/k1_1,k2_10.svg" srcset="/img/loading.gif" lazyload alt="k1_1,k2_10"></p>
+<p>3、<script type="math/tex">k_1=2   \qquad  k_2=10</script>   ：</p>
+<p><img src="/img/LQR_3508/k1_2,k2_10.svg" srcset="/img/loading.gif" lazyload alt="k1_2,k2_10"></p>
+<p>4、<script type="math/tex">k_1=3   \qquad  k_2=10</script>   ：</p>
+<p><img src="/img/LQR_3508/k1_3,k2_10.svg" srcset="/img/loading.gif" lazyload alt="k1_3,k2_10"></p>
+<p>从上面四张图中可以看出，<script type="math/tex">k_1</script>较小时，位置误差不是那么重要，电机位置误差在系统输入中占比较小，同时因为速度误差占比较大，电机倾向于以较慢的速度进行相应，电机位置的阶跃响应较慢。随着<script type="math/tex">k_1</script>的增大，电机位置误差所占权重越来越大。电机阶跃响应速度明显变快，同时可以注意到电机速度的最大值不断增加。</p>
+<p>所以，在参数整定的过程中，如果系统的阶跃响应较慢，上升时间较长，可以考虑增大<script type="math/tex">k_1</script>来加快响应。</p>
+<h4 id="3-1-2-k-2-K-speed-大小对于最终效果的影响"><a href="#3-1-2-k-2-K-speed-大小对于最终效果的影响" class="headerlink" title="3.1.2 k_{2}(K_{speed})大小对于最终效果的影响"></a>3.1.2 <script type="math/tex">k_{2}</script>(<script type="math/tex">K_{speed}</script>)大小对于最终效果的影响</h4><p>在本小节中，我们固定<script type="math/tex">k_1</script>不变，仅改变<script type="math/tex">k_2</script>的值，测量电机的阶跃响应。所有位置数据和速度数据均已进行过归一化。在J-scope中读出实际位置和实际速度的数据，在matlab中绘制图像。本小节所有数据皆为实测。</p>
+<p>不同参数下电机的阶跃响应如下图所示，左侧为位置随时间变化的曲线，右侧为速度随时间变化的曲线。</p>
+<p>1、<script type="math/tex">k_1=2.5   \qquad  k_2=2.5</script>   ：</p>
+<p><img src="/img/LQR_3508/k1_2.5,k2_2.5.svg" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>2、<script type="math/tex">k_1=2.5   \qquad  k_2=5</script>    ：                                                  </p>
+<p><img src="/img/LQR_3508/k1_2.5,k2_5.svg" srcset="/img/loading.gif" lazyload alt=""> </p>
+<p>3、<script type="math/tex">k_1=2.5   \qquad  k_2=7.5</script>   ：                                                                             </p>
+<p><img src="/img/LQR_3508/k1_2.5,k2_7.5.svg" srcset="/img/loading.gif" lazyload alt="K12.5K27.5"></p>
+<p>4、<script type="math/tex">k_1=2.5   \qquad  k_2=10</script>   :                                      </p>
+<p><img src="/img/LQR_3508/k1_2.5,k2_10.svg" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>从上面四张图中可以看出，固定<script type="math/tex">k_1</script>不变时，一开始<script type="math/tex">k_2</script>较小，说明速度误差不是那么重要，在系统输出中速度误差项占比较小，所以电机速度收敛为0的速度较慢 ，系统阶跃响应出现了很大的超调和震荡。随着<script type="math/tex">k_2</script>的增大，速度误差的占比逐渐增大，电机阶跃响应的超调减小，收敛速度变快且震荡逐渐消失，到了最后电机完全没有超调和震荡，且响应速度没有收到明显影响。                                                    </p>
+<p>所以，在参数整定的过程中，如果阶跃响应出现了超调和震荡，可以考虑增大<script type="math/tex">k_2</script>来予以消除。</p>
+<h4 id="3-1-3-简单经验总结"><a href="#3-1-3-简单经验总结" class="headerlink" title="3.1.3 简单经验总结"></a>3.1.3 简单经验总结</h4><ul>
+<li>如果系统的阶跃响应较慢，上升时间较长，可以考虑增大<script type="math/tex">k_1</script>来加快响应。</li>
+</ul>
+<ul>
+<li>如果阶跃响应出现了超调和震荡，可以考虑增大<script type="math/tex">k_2</script>来予以消除。</li>
+</ul>
+<h4 id="3-1-4-LQR和PID效果比较-时域参数整定"><a href="#3-1-4-LQR和PID效果比较-时域参数整定" class="headerlink" title="3.1.4 LQR和PID效果比较(时域参数整定)"></a>3.1.4 LQR和PID效果比较(时域参数整定)</h4><p>在比较中，我先在阶跃响应幅度为8的时候，将PID和LQR的时域响应都调到了最优(在没有超调的时候上升时间最短)，相应的参数为：</p>
+<p>​                           对于<script type="math/tex">LQR</script>：          $$K_{location}=3.8,K_{speed}=13.6,K_{total}=1$$</p>
+<p>​                           对于<script type="math/tex">PID</script>：     $$速度环：K_p=12,K_i=0.01\quad 位置环：K_p=0.45$$</p>
+<p>之后给予幅度为76的阶跃信号，分别测量两者阶跃响应曲线，进行比较：</p>
+<p><img src="/img/LQR_3508/PIDvsLQR，sl76.svg" srcset="/img/loading.gif" lazyload alt=""></p>
+<p><img src="/img/LQR_3508/PID&amp;LQRin1.svg" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>可以看到，采用LQR控制的电机响应速度比采用PID控制的电机响应速度要快一些，在J-scope中使用示波器光标实测LQR的上升时间要比PID的上升时间小200ms左右，其中LQR的上升时间约为500ms，PID的上升时间约为700ms。且LQR的超调量明显小于PID，电机拿在手中调试的过程中也感觉到LQR比PID要更加顺滑且明显LQR响应更快。</p>
+<p>LQR不仅响应比PID快，调试参数时也更加简单方便。LQR中的<script type="math/tex">K_{location}</script>和<script type="math/tex">K_{speed}</script>意义明确，很容易和时域指标对应起来。比起双环PID，LQR同时采用速度和位置计算期望的电流值，省去了中间环节，更为直接迅速，控制的实时性更高。</p>
+<h3 id="3-2-系统辨识得到系统参数，matlab进行LQR设计"><a href="#3-2-系统辨识得到系统参数，matlab进行LQR设计" class="headerlink" title="3.2 系统辨识得到系统参数，matlab进行LQR设计"></a>3.2 系统辨识得到系统参数，matlab进行LQR设计</h3><h4 id="3-2-1-系统辨识思路"><a href="#3-2-1-系统辨识思路" class="headerlink" title="3.2.1 系统辨识思路"></a>3.2.1 系统辨识思路</h4><h4 id="3-2-2-辨识结果"><a href="#3-2-2-辨识结果" class="headerlink" title="3.2.2 辨识结果"></a>3.2.2 辨识结果</h4><h4 id="3-3-3-仿真效果"><a href="#3-3-3-仿真效果" class="headerlink" title="3.3.3 仿真效果"></a>3.3.3 仿真效果</h4><h4 id="3-3-4-电机实测效果"><a href="#3-3-4-电机实测效果" class="headerlink" title="3.3.4 电机实测效果"></a>3.3.4 电机实测效果</h4><h2 id="5-参考文献："><a href="#5-参考文献：" class="headerlink" title="5 参考文献："></a>5 参考文献：</h2><p>[1] <a target="_blank" rel="noopener" href="https://ctms.engin.umich.edu/CTMS/index.php?example=InvertedPendulum&amp;section=ControlStateSpace">https://ctms.engin.umich.edu/CTMS/index.php?example=InvertedPendulum&amp;section=ControlStateSpace</a>  (一篇关于倒立摆的状态空间设计的文章，本文许多仿真及思想借鉴于此)</p>
+<p>[2]《现代控制系统 Modern Control System》Richard C.Dorf   (很多概念讲的很详细清楚)</p>
+<p>[3]《自动控制原理与设计 Feedback Control of Dynamic System》Gene F.Franklin  (其中的许多思想非常好)</p>
+<p>[4] <a target="_blank" rel="noopener" href="https://bbs.robomaster.com/forum.php?mod=viewthread&amp;tid=4941">https://bbs.robomaster.com/forum.php?mod=viewthread&amp;tid=4941</a> (RM官方系统辨识教程，本文中主要系统辨识方法来源于此篇文章)</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Control/">Control</a>
+                    
+                      <a class="hover-with-bg" href="/tags/Optimal-Control/">Optimal Control</a>
+                    
+                      <a class="hover-with-bg" href="/tags/Algorithum/">Algorithum</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/12/02/%E7%94%B5%E6%9C%BA%E4%BA%91%E5%8F%B0%E7%B3%BB%E7%BB%9F%E8%BE%A8%E8%AF%86%E6%96%B9%E6%B3%95/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">电机和云台系统辨识方法</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/11/30/PnP(Perspective-n-Point)%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93/">
+                        <span class="hidden-mobile">PnP(Perspective-n-Point)问题：各种算法总结分析</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;TOC</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        loader: {
+          load: ['ui/lazy']
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

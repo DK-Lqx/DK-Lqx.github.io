@@ -1,0 +1,561 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/browser_tab.jpeg">
+  <link rel="icon" href="/img/browser_tab.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="在Robomaster研究控制时，为了得到系统的传递函数，研究了相关技术">
+  <meta name="author" content="lqx">
+  <meta name="keywords" content="">
+  <meta name="description" content="在Robomaster研究控制时，为了得到系统的传递函数，研究了相关技术">
+<meta property="og:type" content="article">
+<meta property="og:title" content="电机和云台系统辨识方法">
+<meta property="og:url" content="http://example.com/2021/12/02/%E7%94%B5%E6%9C%BA%E4%BA%91%E5%8F%B0%E7%B3%BB%E7%BB%9F%E8%BE%A8%E8%AF%86%E6%96%B9%E6%B3%95/index.html">
+<meta property="og:site_name" content="Robotics and Astronomy by lqx">
+<meta property="og:description" content="在Robomaster研究控制时，为了得到系统的传递函数，研究了相关技术">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/img/SystemIdentification/框图.png">
+<meta property="og:image" content="http://example.com/img/SystemIdentification/时域输入输出.svg">
+<meta property="og:image" content="http://example.com/img/SystemIdentification/bode_sys_cl.svg">
+<meta property="og:image" content="http://example.com/img/SystemIdentification/direct_sys_cl.svg">
+<meta property="og:image" content="http://example.com/img/SystemIdentification/fft_sys_cl.svg">
+<meta property="og:image" content="http://example.com/img/SystemIdentification/3_sys_cl.svg">
+<meta property="og:image" content="http://example.com/img/SystemIdentification/1.png">
+<meta property="og:image" content="http://example.com/img/SystemIdentification/bode_syscl_compare.svg">
+<meta property="og:image" content="http://example.com/img/SystemIdentification/bode_syso_compare.svg">
+<meta property="og:image" content="http://example.com/img/SystemIdentification/sisotool.png">
+<meta property="og:image" content="http://example.com/img/SystemIdentification/step_syscl_compare.svg">
+<meta property="article:published_time" content="2021-12-02T07:40:57.474Z">
+<meta property="article:modified_time" content="2021-12-10T07:11:43.156Z">
+<meta property="article:author" content="lqx">
+<meta property="article:tag" content="System Identification">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/SystemIdentification/框图.png">
+  
+  <title>电机和云台系统辨识方法 - Robotics and Astronomy by lqx</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.12","typing":{"enable":false,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>DK-L</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/SystemIdentification/3_sys_cl.svg') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="电机和云台系统辨识方法">
+              
+                电机和云台系统辨识方法
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-12-02 15:40" pubdate>
+        December 2, 2021 pm
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      8.2k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      26 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">电机和云台系统辨识方法</h1>
+            
+            <div class="markdown-body">
+              <h2 id="1-基本思路"><a href="#1-基本思路" class="headerlink" title="1 基本思路"></a>1 基本思路</h2><h3 id="1-1-系统辨识目标"><a href="#1-1-系统辨识目标" class="headerlink" title="1.1 系统辨识目标"></a>1.1 系统辨识目标</h3><p>在控制方案的设计过程中，我们经常需要知道系统的传递函数或者是状态空间方程。只有知道了系统的传递函数，我们才能采用经典控制理论中的工具去分析系统并提出改进方案，根轨迹法以及频率响应法都需要知道系统的开环传递函数，超前-滞后校正器也需要知道系统的相位裕度才有了前进的方向，系统的带宽则需要根据闭环伯德图来确定。</p>
+<p>我们想要知道系统的稳定性(可以通过相位裕度)或者响应速度(可以通过带宽)，并根据具体目标设计超前/滞后校正器或者PID等控制器来提升控制系统的性能，前提是必须知道系统的传递函数。而设计LQR控制器等则需要知道系统的状态空间方程。所以我们必须进行系统辨识，得到系统的传递函数，才能有的放矢的设计控制器来提高系统的性能。</p>
+<p>系统辨识的目标就是在给定一组时域的输入-输出数据之后，得到系统的传递函数或者是状态空间方程。</p>
+<p>在实际应用中，我们需要控制电机或者云台(本质上也是在控制电机)，一般采用的是双环PID，其中位置环仅仅是简单的运动学微分关系，即速度是位置的微分，两者在<script type="math/tex">s</script>域相差一个<script type="math/tex">s</script>的系数，没有什么可辨识的。一般我们感兴趣的是电机电流到电机速度的传递函数，这个一般来说会受到转动惯量、粘滞阻尼、电机转矩常数等多种因素制约，而这些参数我们一般不容易精确测定，这时候就需要通过系统辨识来得到从电机电流到电机转速的传递函数。</p>
+<h3 id="1-2-系统框图"><a href="#1-2-系统框图" class="headerlink" title="1.2 系统框图"></a>1.2 系统框图</h3><p><img src="/img/SystemIdentification/框图.png" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>一般闭环系统框图如上图所示。以电机速度环为例，<script type="math/tex">r(t)</script>是参考输入，即电机的期望速度；<script type="math/tex">C(s)</script>是控制器的传递函数，即PID等控制器的传递函数；<script type="math/tex">G(s)</script>是被控对象的传递函数，即从电机电流到电机速度的传递函数；<script type="math/tex">H(s)</script>为观测器的传递函数，电机速度环中该传递函数为1，即单位反馈；<script type="math/tex">y(t)</script>为输出，即电机实际的速度输出；<script type="math/tex">u</script>是系统的输入，电机速度环中即为电机的电流。</p>
+<p>系统的闭环传递函数为：<script type="math/tex">\Phi(s)=\frac{Y(s)}{R(s)}=\frac{C(s)G(s)}{1+C(s)G(s)H(s)}</script>，该传递函数可用于确定当给一个期望的速度时，系统实际输出的速度到底是什么，即在参考输入和实际输出之间架起了桥梁。</p>
+<h3 id="1-3-基本原理"><a href="#1-3-基本原理" class="headerlink" title="1.3 基本原理"></a>1.3 基本原理</h3><p>在实际中，我们采集不同频率下的云台或电机输入输出数据（即参考的速度输入和实际的速度输出），通过系统辨识确定系统的闭环传递函数<script type="math/tex">\Phi(s)</script>。</p>
+<p>因为系统的闭环传递函数<script type="math/tex">\Phi(s)</script>架起了参考输入<script type="math/tex">r(t)</script>和实际输出<script type="math/tex">y(t)</script>之间的桥梁，所以我们采集不同频率下的参考输入-实际输出数据（速度环例子中即为期望的速度和实际的速度），即可确定系统的闭环传递函数<script type="math/tex">\Phi(s)</script>。之后我们可以再算出系统的开环传递函数，进行控制器的设计。</p>
+<p>若要想直接确定系统的开环传递函数，因为被控对象的传递函数<script type="math/tex">G(s)</script>架起了系统输入<script type="math/tex">u(t)</script>和实际输出<script type="math/tex">y(t)</script>之间的桥梁，所以我们采集不同频率下的系统输入-实际输出数据（速度环例子中即为电机的电流和实际的速度），即可确定被控对象的传递函数<script type="math/tex">G(s)</script>。之后我们可以再算出系统的开环传递函数，进行控制器的设计。</p>
+<p>为了得到不同频率下响应的幅度-相位关系，我们依次输入从低频到高频的不同频率的正弦波，采集系统的实际响应，以此进行系统辨识。</p>
+<h3 id="1-4-所需工具"><a href="#1-4-所需工具" class="headerlink" title="1.4 所需工具"></a>1.4 所需工具</h3><p>Keil、J-scope、Matlab(systeIdentification工具箱)。</p>
+<h3 id="1-5-基本步骤："><a href="#1-5-基本步骤：" class="headerlink" title="1.5 基本步骤："></a>1.5 基本步骤：</h3><ul>
+<li>在Yaw轴云台/电机上加载速度环PID控制器，使得系统可以稳定运行</li>
+<li>写一个简单的信号发生器，将频率逐渐增加的激励信号输入至PID控制器</li>
+<li>采集并记录对应时刻的激励信号和角速度信息(期望速度和实际速度)</li>
+<li>对输入输出数据进行系统辨识得到系统闭环传递函数，用其他方法进行验证</li>
+</ul>
+<h2 id="2-电机系统辨识效果"><a href="#2-电机系统辨识效果" class="headerlink" title="2 电机系统辨识效果"></a>2 电机系统辨识效果</h2><h3 id="2-1-激励信号"><a href="#2-1-激励信号" class="headerlink" title="2.1 激励信号"></a>2.1 激励信号</h3><p>产生频率从1Hz到500Hz变化的正弦信号，每个频率点持续一定周期。由于频率范围较大，且高频部分云台振幅变化较小，为了减少数据量，采用类指数形式的变化趋势。为了保证信号不会发生跳变，在每次信号频率发生变化时都需要从零相位开始，因此周期需要是整数。使用MATLAB生成的激励信号频率如下：</p>
+<figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><code class="hljs matlab">F = ([<span class="hljs-number">1</span>:<span class="hljs-number">0.5</span>:<span class="hljs-number">22</span>, <span class="hljs-number">24</span>:<span class="hljs-number">2</span>:<span class="hljs-number">40</span>, <span class="hljs-number">50</span>:<span class="hljs-number">10</span>:<span class="hljs-number">120</span>,<span class="hljs-number">200</span>,<span class="hljs-number">250</span>,<span class="hljs-number">333</span>,<span class="hljs-number">500</span>]);<br>T = <span class="hljs-built_in">round</span>(<span class="hljs-number">1000.</span>/F);<span class="hljs-comment">%周期取整</span><br>F = <span class="hljs-number">1000.</span>/T;        <br></code></pre></td></tr></table></figure>
+<h3 id="2-2-数据采集"><a href="#2-2-数据采集" class="headerlink" title="2.2 数据采集"></a>2.2 数据采集</h3><p>将J-scope中电机采集到的输入-输出数据导出为csv格式的文件，进而转为Excel导入到matlab中进一步处理。</p>
+<p>得到的参考输入和实际输出的时域图像为：</p>
+<p><img src="/img/SystemIdentification/时域输入输出.svg" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>由时域图像可以看出，在高频下输出的幅度明显衰减。</p>
+<h3 id="2-3-辨识结果"><a href="#2-3-辨识结果" class="headerlink" title="2.3 辨识结果"></a>2.3 辨识结果</h3><p>之后将数据导入到systemIdentification工具箱中进行系统辨识。因为目前我的J-scope的采集频率只能到80Hz左右，采样间隔在12ms-20ms之间不等，因此Sample time 设定为0.016，即16ms，实测和其他两种方法得到的结果较为吻合。注意这个Sample time的设定一定要与实际的采样间隔相符合，否则得到的结果有较大问题。</p>
+<p>辨识得到的传递函数为：   $$\Phi(s)=\frac{Y(s)}{R(s)}=\frac{86.9s+9691}{s^2+136.7s+10420}$$   </p>
+<p>系统伯德图为：</p>
+<p><img src="/img/SystemIdentification/bode_sys_cl.svg" srcset="/img/loading.gif" lazyload alt=""></p>
+<h3 id="2-4-结果验证"><a href="#2-4-结果验证" class="headerlink" title="2.4 结果验证"></a>2.4 结果验证</h3><h4 id="2-4-1-直接测量不同频率下输出的幅值和相位"><a href="#2-4-1-直接测量不同频率下输出的幅值和相位" class="headerlink" title="2.4.1 直接测量不同频率下输出的幅值和相位"></a>2.4.1 直接测量不同频率下输出的幅值和相位</h4><p>在stm32的程序中，通过查找一定时间内的云台角速度的极值找出幅度，通过计算输入输出信号下降沿穿过x轴的时间差除以周期来计算该频率下的相位差。</p>
+<p>得到输入-输出的幅度和相位差分别为：</p>
+<p><img src="/img/SystemIdentification/direct_sys_cl.svg" srcset="/img/loading.gif" lazyload alt=""></p>
+<h4 id="2-4-2-对时域数据进行FFT得到频率响应"><a href="#2-4-2-对时域数据进行FFT得到频率响应" class="headerlink" title="2.4.2 对时域数据进行FFT得到频率响应"></a>2.4.2 对时域数据进行FFT得到频率响应</h4><p>对时域数据做fft变换，然后计算输入输出数据的幅度比和相位差，得到系统的频率响应：</p>
+<p><img src="/img/SystemIdentification/fft_sys_cl.svg" srcset="/img/loading.gif" lazyload alt=""></p>
+<h4 id="2-4-3-三种方法比较"><a href="#2-4-3-三种方法比较" class="headerlink" title="2.4.3 三种方法比较"></a>2.4.3 三种方法比较</h4><p>三种方法得到的闭环响应幅频特性比较如下：</p>
+<p><img src="/img/SystemIdentification/3_sys_cl.svg" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>由图可见，在低频部分，系统辨识得到的传递函数能够较好的拟合fft变换的结果和实测的频率响应结果，因此可以用该传递函数来刻画电机系统。<br>由bode图可以看出3dB带宽大概为140rad/s，实际意义就是该云台系统能够响应的频率22.3Hz以内。</p>
+<h3 id="2-5-后续"><a href="#2-5-后续" class="headerlink" title="2.5 后续"></a>2.5 后续</h3><p>得到系统闭环传递函数后，经过处理可以得到开环传递函数，以便进一步分析系统稳定性(bode图、Nyquist图等)，还可以用频率分析法对环路进行整形，设计超前校正器，从而达到我们想要的性能。</p>
+<h3 id="2-6-代码"><a href="#2-6-代码" class="headerlink" title="2.6 代码"></a>2.6 代码</h3><h4 id="2-6-1-Keil中产生激励信号并收集幅度和相位信息"><a href="#2-6-1-Keil中产生激励信号并收集幅度和相位信息" class="headerlink" title="2.6.1 Keil中产生激励信号并收集幅度和相位信息"></a>2.6.1 Keil中产生激励信号并收集幅度和相位信息</h4><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><code class="hljs c"><span class="hljs-keyword">float</span> t[<span class="hljs-number">64</span>] = &#123;<span class="hljs-number">1000</span>, <span class="hljs-number">667</span>, <span class="hljs-number">500</span>, <span class="hljs-number">400</span>, <span class="hljs-number">333</span>, <span class="hljs-number">286</span>, <span class="hljs-number">250</span>, <span class="hljs-number">222</span>, <span class="hljs-number">200</span>, <span class="hljs-number">182</span>, <span class="hljs-number">167</span>, <span class="hljs-number">154</span>, <span class="hljs-number">143</span>, <span class="hljs-number">133</span>, <span class="hljs-number">125</span>, <span class="hljs-number">118</span>, <span class="hljs-number">111</span>, <span class="hljs-number">105</span>, <span class="hljs-number">100</span>, <span class="hljs-number">95</span>, <span class="hljs-number">91</span>, <span class="hljs-number">87</span>, <span class="hljs-number">83</span>, <span class="hljs-number">80</span>, <span class="hljs-number">77</span>, <span class="hljs-number">74</span>, <span class="hljs-number">71</span>, <span class="hljs-number">69</span>, <span class="hljs-number">67</span>, <span class="hljs-number">65</span>, <span class="hljs-number">63</span>, <span class="hljs-number">61</span>, <span class="hljs-number">59</span>, <span class="hljs-number">57</span>, <span class="hljs-number">56</span>, <span class="hljs-number">54</span>, <span class="hljs-number">53</span>, <span class="hljs-number">51</span>, <span class="hljs-number">50</span>, <span class="hljs-number">49</span>, <span class="hljs-number">48</span>, <span class="hljs-number">47</span>, <span class="hljs-number">45</span>, <span class="hljs-number">42</span>, <span class="hljs-number">38</span>, <span class="hljs-number">36</span>, <span class="hljs-number">33</span>, <span class="hljs-number">31</span>, <span class="hljs-number">29</span>, <span class="hljs-number">28</span>, <span class="hljs-number">26</span>, <span class="hljs-number">25</span>, <span class="hljs-number">20</span>, <span class="hljs-number">17</span>, <span class="hljs-number">14</span>, <span class="hljs-number">13</span>, <span class="hljs-number">11</span>, <span class="hljs-number">10</span>, <span class="hljs-number">9</span>, <span class="hljs-number">8</span>, <span class="hljs-number">5</span>, <span class="hljs-number">4</span>, <span class="hljs-number">3</span>, <span class="hljs-number">2</span>&#125;;<span class="hljs-comment">//不同频率信号的周期</span><br><span class="hljs-keyword">float</span> f[<span class="hljs-number">64</span>] = &#123;<span class="hljs-number">1.000000</span>, <span class="hljs-number">1.499250</span>, <span class="hljs-number">2.000000</span>, <span class="hljs-number">2.500000</span>, <span class="hljs-number">3.003003</span>, <span class="hljs-number">3.496503</span>, <span class="hljs-number">4.000000</span>, <span class="hljs-number">4.504505</span>, <span class="hljs-number">5.000000</span>, <span class="hljs-number">5.494505</span>, <span class="hljs-number">5.988024</span>, <span class="hljs-number">6.493506</span>, <span class="hljs-number">6.993007</span>, <span class="hljs-number">7.518797</span>, <span class="hljs-number">8.000000</span>, <span class="hljs-number">8.474576</span>, <span class="hljs-number">9.009009</span>, <span class="hljs-number">9.523810</span>, <span class="hljs-number">10.000000</span>, <span class="hljs-number">10.526316</span>, <span class="hljs-number">10.989011</span>, <span class="hljs-number">11.494253</span>, <span class="hljs-number">12.048193</span>, <span class="hljs-number">12.500000</span>, <span class="hljs-number">12.987013</span>, <span class="hljs-number">13.513514</span>, <span class="hljs-number">14.084507</span>, <span class="hljs-number">14.492754</span>, <span class="hljs-number">14.925373</span>, <span class="hljs-number">15.384615</span>, <span class="hljs-number">15.873016</span>, <span class="hljs-number">16.393443</span>, <span class="hljs-number">16.949153</span>, <span class="hljs-number">17.543860</span>, <span class="hljs-number">17.857143</span>, <span class="hljs-number">18.518519</span>, <span class="hljs-number">18.867925</span>, <span class="hljs-number">19.607843</span>, <span class="hljs-number">20.000000</span>, <span class="hljs-number">20.408163</span>, <span class="hljs-number">20.833333</span>, <span class="hljs-number">21.276596</span>, <span class="hljs-number">22.222222</span>, <span class="hljs-number">23.809524</span>, <br><span class="hljs-number">26.315789</span>, <span class="hljs-number">27.777778</span>, <span class="hljs-number">30.303030</span>, <span class="hljs-number">32.258065</span>, <span class="hljs-number">34.482759</span>, <span class="hljs-number">35.714286</span>, <span class="hljs-number">38.461538</span>, <span class="hljs-number">40.000000</span>, <span class="hljs-number">50.0000</span>, <span class="hljs-number">58.8235</span>, <span class="hljs-number">71.4286</span>, <span class="hljs-number">76.9231</span>, <span class="hljs-number">90.9091</span>, <span class="hljs-number">100.0000</span>, <span class="hljs-number">111.1111</span>, <span class="hljs-number">125.0000</span>, <span class="hljs-number">200.0000</span>, <span class="hljs-number">250.0000</span>, <span class="hljs-number">333.3333</span>, <span class="hljs-number">500.0000</span>&#125;;<span class="hljs-comment">//不同频率信号的频率</span><br><br><span class="hljs-keyword">int</span> mag[<span class="hljs-number">64</span>] = &#123;<span class="hljs-number">0</span>&#125;;<span class="hljs-comment">//存放不同频率时的幅度信息</span><br><span class="hljs-keyword">int</span> phase[<span class="hljs-number">64</span>] = &#123;<span class="hljs-number">0</span>&#125;;<span class="hljs-comment">//存放不同频率时的相位信息</span><br><span class="hljs-keyword">int</span> i_measure = <span class="hljs-number">0</span>;<span class="hljs-comment">//存放幅度相位信息时的数组下标</span><br><br><span class="hljs-keyword">int</span> i_sin = <span class="hljs-number">0</span>;<span class="hljs-comment">//选择不同频率的数组下标</span><br><span class="hljs-keyword">float</span> time_sin = <span class="hljs-number">0</span>;<span class="hljs-comment">//正弦信号的计时器</span><br><span class="hljs-keyword">float</span> sin_signal;<span class="hljs-comment">//最终的正弦信号</span><br><br><span class="hljs-keyword">int8_t</span> record_phase = <span class="hljs-number">1</span>;<span class="hljs-comment">//记录相位时需要的标志位</span><br><span class="hljs-keyword">int</span> state = <span class="hljs-number">0</span>;<span class="hljs-comment">//状态机，记录相位时需要</span><br><span class="hljs-keyword">float</span> time_target_0 = <span class="hljs-number">0</span>;<span class="hljs-comment">//参考输入穿越0点的时间</span><br><span class="hljs-keyword">float</span> time_actual_0 = <span class="hljs-number">0</span>;<span class="hljs-comment">//实际输出穿越0点的时间</span><br><br><span class="hljs-comment">//以下代码可以在FreeRTOS里专门开个Task在里面1ms跑一次：</span><br><span class="hljs-function"><span class="hljs-keyword">void</span> <span class="hljs-title">SignalGenerate</span><span class="hljs-params">(<span class="hljs-keyword">void</span> <span class="hljs-keyword">const</span> * argument)</span></span><br><span class="hljs-function"></span>&#123;<br>  <span class="hljs-comment">/* USER CODE BEGIN SignalGenerate */</span><br>  <span class="hljs-comment">/* Infinite loop */</span><br>  <span class="hljs-keyword">for</span>(;;)<br>  &#123;<br>    <span class="hljs-keyword">if</span>(time_sin * <span class="hljs-number">100</span> &gt; t[i_sin] &amp;&amp; i_sin &lt;= <span class="hljs-number">63</span>)<br>    &#123;<span class="hljs-comment">//不同频率信号之间的切换，改变time_sin * 100中的数字可以调节总时间</span><br>		 i_sin++;<br>		 i_measure++;<br>	  	 time_sin = <span class="hljs-number">0</span>;<br>		 record_phase =<span class="hljs-number">1</span>;<br>		 state = <span class="hljs-number">0</span>;<br>     &#125;<br>    <span class="hljs-keyword">if</span>(i_sin == <span class="hljs-number">64</span>)<span class="hljs-comment">//激励信号结束</span><br>	 &#123;<br>		 sin_signal = <span class="hljs-number">0</span>;<br>		 time_sin = <span class="hljs-number">0</span>;<br>	 &#125;<br>				<br>	 sin_signal = <span class="hljs-built_in">sin</span>(<span class="hljs-number">2</span> * <span class="hljs-number">3.1415926</span> * f[i_sin] * time_sin);<span class="hljs-comment">//正弦信号</span><br>	 <span class="hljs-comment">//sin_signal = sin(2 * 3.1415926 * f[i_sin] * time_sin) &gt; 0?0:1;//阶跃信号</span><br>				<br>	 time_sin += <span class="hljs-number">0.001f</span>;<br>      <br>	 motor_pid[<span class="hljs-number">0</span>].target = <span class="hljs-number">2000</span>*sin_signal;<span class="hljs-comment">//闭环传递函数辨识</span><br>	 <span class="hljs-comment">//motor_pid[0].output = 2000*sin_signal;//开环传递函数辨识</span><br>				<br>	 <span class="hljs-keyword">if</span>(moto_chassis[<span class="hljs-number">0</span>].speed_rpm &gt; mag[i_measure])<span class="hljs-comment">//记录最大幅度</span><br>	   mag[i_measure] = moto_chassis[<span class="hljs-number">0</span>].speed_rpm;<br>				<br>	 <span class="hljs-keyword">if</span>(<span class="hljs-built_in">fabs</span>(motor_pid[<span class="hljs-number">0</span>].target)&lt;<span class="hljs-number">20</span> &amp;&amp; state == <span class="hljs-number">0</span>)<span class="hljs-comment">//记录穿越零点的时间 </span><br>	 &#123; <br>		 time_target_0 = time_sin;<br>		 state = <span class="hljs-number">1</span>;<br>	 &#125;<br>	 <span class="hljs-keyword">if</span>(<span class="hljs-built_in">fabs</span>(moto_chassis[<span class="hljs-number">0</span>].speed_rpm)&lt;<span class="hljs-number">20</span> &amp;&amp; state ==<span class="hljs-number">1</span> ) <br>	 &#123;<br>		 time_actual_0 = time_sin;<br>		 state = <span class="hljs-number">2</span>;<br>	 &#125;				<br>	 <span class="hljs-keyword">if</span>(record_phase &amp;&amp; state == <span class="hljs-number">2</span>)<span class="hljs-comment">//记录相位</span><br>	 &#123;<br>		 phase[i_measure] = (<span class="hljs-keyword">int</span>)(<span class="hljs-number">360</span>*                                                          (time_actual_0time_target_0)/(t[i_measure]/<span class="hljs-number">1000.0f</span>))%<span class="hljs-number">360</span>;<br>		 record_phase = <span class="hljs-number">0</span>;<br>	 &#125;<br>      <br>     osDelay(<span class="hljs-number">1</span>);<br>  &#125;<br>  <span class="hljs-comment">/* USER CODE END SignalGenerate */</span><br>&#125;<br>				<br></code></pre></td></tr></table></figure>
+<h4 id="2-6-2-matlab中数据处理代码"><a href="#2-6-2-matlab中数据处理代码" class="headerlink" title="2.6.2 matlab中数据处理代码"></a>2.6.2 matlab中数据处理代码</h4><figure class="highlight matlab"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><code class="hljs matlab"><span class="hljs-comment">%%计算激励信号的产生周期</span><br>F = ([<span class="hljs-number">1</span>:<span class="hljs-number">0.5</span>:<span class="hljs-number">22</span>, <span class="hljs-number">24</span>:<span class="hljs-number">2</span>:<span class="hljs-number">40</span>, <span class="hljs-number">50</span>:<span class="hljs-number">10</span>:<span class="hljs-number">120</span>,<span class="hljs-number">200</span>,<span class="hljs-number">250</span>,<span class="hljs-number">333</span>,<span class="hljs-number">500</span>]);<br>T = <span class="hljs-built_in">round</span>(<span class="hljs-number">1000.</span>/F)<span class="hljs-comment">%对激励信号的周期进行取整        </span><br>F = <span class="hljs-number">1000.</span>/T<br><br><span class="hljs-comment">%%计算FFT的代码</span><br>N_FFT = <span class="hljs-number">8192</span>;<br>Fs = <span class="hljs-number">80</span>;<span class="hljs-comment">%采样频率，单位为Hz</span><br>Y1 = fft(test_target4,N_FFT);<span class="hljs-comment">%参考输入信号的FFT变换</span><br>Y2 = fft(test_actual4,N_FFT);<span class="hljs-comment">%实际输出信号的FFT变换</span><br>Y = Y2./Y1;<span class="hljs-comment">%计算输出和输入的比值</span><br>F_fft = ((<span class="hljs-number">0</span>:<span class="hljs-number">1</span>/N_FFT:<span class="hljs-number">1</span><span class="hljs-number">-1</span>/N_FFT)*Fs).&#x27;; <span class="hljs-comment">%得到变换后的频率</span><br>N_plot = <span class="hljs-built_in">length</span>(F_fft)/<span class="hljs-number">2</span>; <span class="hljs-comment">%由对称性，频率选一半即可</span><br><br><span class="hljs-comment">%%单片机实测的数据</span><br>w=<span class="hljs-built_in">logspace</span>(<span class="hljs-number">0</span>,<span class="hljs-number">4</span>,<span class="hljs-number">500</span>);<span class="hljs-comment">%产生对数变化的频率点</span><br>mag=[<span class="hljs-number">2025</span>,<span class="hljs-number">2027</span>,<span class="hljs-number">2029</span>,<span class="hljs-number">2023</span>,<span class="hljs-number">2034</span>,<span class="hljs-number">2046</span>,<span class="hljs-number">2059</span>,<span class="hljs-number">2044</span>,<span class="hljs-number">2054</span>,<span class="hljs-number">2044</span>,<span class="hljs-number">2065</span>,<span class="hljs-number">2044</span>,<span class="hljs-number">2084</span>,<span class="hljs-number">2077</span>,<span class="hljs-number">2080</span>,<span class="hljs-number">2268</span>,<span class="hljs-number">2096</span>,<span class="hljs-number">2126</span>,<span class="hljs-number">2274</span>,<span class="hljs-number">2132</span>,<span class="hljs-number">2211</span>,<span class="hljs-number">2134</span>,<span class="hljs-number">2178</span>,<span class="hljs-number">2130</span>,<span class="hljs-number">2144</span>,<span class="hljs-number">2088</span>,<span class="hljs-number">2163</span>,<span class="hljs-number">2161</span>,<span class="hljs-number">2228</span>,<span class="hljs-number">2295</span>,<span class="hljs-number">2385</span>,<span class="hljs-number">2230</span>,<span class="hljs-number">2299</span>,<span class="hljs-number">2333</span>,<span class="hljs-number">2082</span>,<span class="hljs-number">2222</span>,<span class="hljs-number">2153</span>,<span class="hljs-number">2270</span>,<span class="hljs-number">1927</span>,<span class="hljs-number">1866</span>,<span class="hljs-number">2054</span>,<span class="hljs-number">2049</span>,<span class="hljs-number">1715</span>,<span class="hljs-number">2042</span>,<span class="hljs-number">1435</span>,<span class="hljs-number">1418</span>,<span class="hljs-number">1554</span>,<span class="hljs-number">1203</span>,<span class="hljs-number">1232</span>,<span class="hljs-number">1263</span>,<span class="hljs-number">950</span>,<span class="hljs-number">1098</span>,<span class="hljs-number">954</span>,<span class="hljs-number">807</span>,<span class="hljs-number">770</span>,<span class="hljs-number">619</span>,<span class="hljs-number">299</span>,<span class="hljs-number">246</span>,<span class="hljs-number">269</span>,<span class="hljs-number">174</span>,<span class="hljs-number">144</span>,<span class="hljs-number">54</span>,<span class="hljs-number">50</span>,<span class="hljs-number">66</span>];<span class="hljs-comment">%单片机实测的幅值</span><br>mag = mag/<span class="hljs-number">2000</span>;<span class="hljs-comment">%实际输出幅值/参考输入幅值</span><br>mag=<span class="hljs-number">20</span>*<span class="hljs-built_in">log10</span>(mag);<span class="hljs-comment">%转化为dB</span><br>p = [<span class="hljs-number">0</span>,<span class="hljs-number">3</span>,<span class="hljs-number">4</span>,<span class="hljs-number">6</span>,<span class="hljs-number">7</span>,<span class="hljs-number">10</span>,<span class="hljs-number">10</span>,<span class="hljs-number">12</span>,<span class="hljs-number">14</span>,<span class="hljs-number">15</span>,<span class="hljs-number">15</span>,<span class="hljs-number">18</span>,<span class="hljs-number">20</span>,<span class="hljs-number">21</span>,<span class="hljs-number">23</span>,<span class="hljs-number">22</span>,<span class="hljs-number">22</span>,<span class="hljs-number">24</span>,<span class="hljs-number">25</span>,<span class="hljs-number">26</span>,<span class="hljs-number">28</span>,<span class="hljs-number">30</span>,<span class="hljs-number">32</span>,<span class="hljs-number">34</span>,<span class="hljs-number">36</span>,<span class="hljs-number">38</span>,<span class="hljs-number">40</span>,<span class="hljs-number">42</span>,<span class="hljs-number">44</span>,<span class="hljs-number">44</span>,<span class="hljs-number">51</span>,<span class="hljs-number">53</span>,<span class="hljs-number">54</span>,<span class="hljs-number">58</span>,<span class="hljs-number">62</span>,<span class="hljs-number">66</span>,<span class="hljs-number">68</span>,<span class="hljs-number">70</span>,<span class="hljs-number">64</span>,<span class="hljs-number">73</span>,<span class="hljs-number">82</span>,<span class="hljs-number">80</span>,<span class="hljs-number">80</span>,<span class="hljs-number">111</span>,<span class="hljs-number">104</span>,<span class="hljs-number">120</span>,<span class="hljs-number">120</span>,<span class="hljs-number">116</span>];<span class="hljs-comment">%单片机实测的相位</span><br><br><span class="hljs-comment">%%系统辨识得到的数据</span><br>sys_cl = tf(tf7)<span class="hljs-comment">%此处为实际辨识出的系统闭环传递函数</span><br>[mag_si,phase,w]= bode(sys_cl,w);<br>m_si=<span class="hljs-built_in">zeros</span>(<span class="hljs-built_in">length</span>(w));<br><span class="hljs-keyword">for</span> <span class="hljs-built_in">i</span>=<span class="hljs-number">1</span>:<span class="hljs-built_in">length</span>(w)<br>  m_si(<span class="hljs-built_in">i</span>) = <span class="hljs-number">20</span>*<span class="hljs-built_in">log10</span>(mag_si(<span class="hljs-number">1</span>,<span class="hljs-number">1</span>,<span class="hljs-built_in">i</span>));<br>  p_si(<span class="hljs-built_in">i</span>) = phase(<span class="hljs-number">1</span>,<span class="hljs-number">1</span>,<span class="hljs-built_in">i</span>);<br><span class="hljs-keyword">end</span><br><br><span class="hljs-comment">%%绘图</span><br><span class="hljs-built_in">figure</span>(<span class="hljs-number">1</span>)<br>subplot(<span class="hljs-number">211</span>)<span class="hljs-comment">%幅度</span><br>semilogx(F_fft(<span class="hljs-number">1</span>:N_plot)*<span class="hljs-number">2</span>*<span class="hljs-built_in">pi</span>,<span class="hljs-number">20</span>*<span class="hljs-built_in">log10</span>(<span class="hljs-built_in">abs</span>(Y(<span class="hljs-number">1</span>:N_plot))),<span class="hljs-string">&#x27;c&#x27;</span>)<span class="hljs-comment">%FFT</span><br><span class="hljs-built_in">hold</span> on<br>semilogx(<span class="hljs-number">2</span>*<span class="hljs-built_in">pi</span>*F,mag,<span class="hljs-string">&#x27;b&#x27;</span>);<span class="hljs-comment">%单片机实测</span><br><span class="hljs-built_in">hold</span> on<br>semilogx(w,m_si(:,<span class="hljs-number">1</span>),<span class="hljs-string">&#x27;r&#x27;</span>);<span class="hljs-comment">%系统辨识</span><br>ylabel(<span class="hljs-string">&quot;幅度dB&quot;</span>)<br>subplot(<span class="hljs-number">212</span>)<span class="hljs-comment">%相位</span><br>semilogx(F_fft(<span class="hljs-number">1</span>:N_plot)*<span class="hljs-number">2</span>*<span class="hljs-built_in">pi</span>,<span class="hljs-built_in">angle</span>(Y(<span class="hljs-number">1</span>:N_plot))*<span class="hljs-number">57.3</span>,<span class="hljs-string">&#x27;c&#x27;</span>);<span class="hljs-comment">%FFT</span><br><span class="hljs-built_in">hold</span> on<br>semilogx(<span class="hljs-number">2</span>*<span class="hljs-built_in">pi</span>*F(<span class="hljs-number">1</span>:<span class="hljs-built_in">length</span>(p)),-p,<span class="hljs-string">&#x27;b&#x27;</span>);<span class="hljs-comment">%单片机实测</span><br><span class="hljs-built_in">hold</span> on<br>semilogx(w,p_si,<span class="hljs-string">&#x27;r&#x27;</span>);<span class="hljs-comment">%系统辨识</span><br>ylabel(<span class="hljs-string">&quot;相位°&quot;</span>)<br>xlabel(<span class="hljs-string">&quot;频率rad/s&quot;</span>)<br></code></pre></td></tr></table></figure>
+<h2 id="3利用电机辨识结果设计控制器"><a href="#3利用电机辨识结果设计控制器" class="headerlink" title="3利用电机辨识结果设计控制器"></a>3利用电机辨识结果设计控制器</h2><h3 id="3-1-辨识效果"><a href="#3-1-辨识效果" class="headerlink" title="3.1 辨识效果"></a>3.1 辨识效果</h3><p>针对系统框图：</p>
+<p><img src="/img/SystemIdentification/1.png" srcset="/img/loading.gif" lazyload style="zoom: 67%;" /></p>
+<p>我们一共有三种辨识方法：</p>
+<ul>
+<li>闭环辨识，即根据<script type="math/tex">r(t)</script>和<script type="math/tex">y(t)</script>辨识闭环传递函数<script type="math/tex">\Phi(s)</script>，核心是<script type="math/tex">r(t)</script>为不同频率的正弦信号</li>
+<li>直接开环辨识，即根据<script type="math/tex">e(t)</script>和<script type="math/tex">y(t)</script>辨识开环传递函数<script type="math/tex">C(s)G(s)</script>，核心是<script type="math/tex">e(t)</script>为不同频率的正弦信号</li>
+<li>电机辨识，即根据<script type="math/tex">u(t)</script>和<script type="math/tex">y(t)</script>辨识电机传递函数<script type="math/tex">G(s)</script>，核心是<script type="math/tex">u(t)</script>为不同频率的正弦信号</li>
+</ul>
+<p>其中，闭环传递函数和开环传递函数有如下关系：   $$\Phi(s)=\frac{C(s)G(s)}{1+C(s)G(s)}$$      $$C(s)G(s)=\frac{\Phi(s)}{1-\Phi(s)}$$   </p>
+<p>分别采用以上三种辨识方法，我们可以得到如下结果：</p>
+<p>采用闭环辨识，得到闭环传递函数为：   $$\Phi(s)=\frac{62.64s+566.2}{s^2+64.69s+621.8}$$   </p>
+<p>采用直接开环辨识，得到开环传递函数和控制器传递函数为：   $$C(s)G(s)=\frac{53.69s^2+874.2s+1527}{s^3+17.6s^2+137.8s+4.287\times10^{-6}}$$       $$C(s)=\frac{9.341s+4.539}{s+0.008438}$$   </p>
+<p>采用电机辨识，得到电机传递函数为：   $$G(s)=\frac{8.07s+1.722}{s^2+0.6468s+0.08032}$$   </p>
+<p>三种方式都可以得到闭环传递函数和开环传递函数，理论上，三种方式得到的结果应当接近：</p>
+<p>实际三种方式得到的闭环和开环传递函数的伯德图如下：</p>
+<p>闭环传递函数：</p>
+<p><img src="/img/SystemIdentification/bode_syscl_compare.svg" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>开环传递函数：</p>
+<p><img src="/img/SystemIdentification/bode_syso_compare.svg" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>可以看到，不同方法得到的开环和闭环传递函数的伯德图基本一致，验证了理论的正确性。</p>
+<h3 id="3-2-PID控制器仿真设计"><a href="#3-2-PID控制器仿真设计" class="headerlink" title="3.2 PID控制器仿真设计"></a>3.2 PID控制器仿真设计</h3><p>PID控制器的设计可以采用matlab工具箱中的sisotool工具，将开环传递函数导入之后，利用PID tuning工具来设计并仿真不同的PID参数，根据时域阶跃响应情况和开环伯德图提供的相位裕度等信息，调整对于响应速度和鲁棒性的需求，即可得到合适的PID参数。实际测试结果和仿真结果基本一致，认为辨识结果可信。</p>
+<p>注意：连续时间的<script type="math/tex">K_I^c</script>和离散时间的<script type="math/tex">K_I^d</script>需要进行如下换算：<script type="math/tex">K^d_I=K_I^c \times T_s</script></p>
+<p>例如，仿真时得到理想的<script type="math/tex">K_I^c</script>是10，控制周期<script type="math/tex">T_s</script>为0.002s，则单片机实现时的<script type="math/tex">K_I^d</script>为10×0.002 = 0.02。</p>
+<p>注意：以下仿真选用的开环传递函数为直接电机辨识而来，即根据<script type="math/tex">u(t)</script>和<script type="math/tex">y(t)</script>直接辨识电机传递函数<script type="math/tex">G(s)</script>。</p>
+<p>PID仿真设计工具如下图：</p>
+<p><img src="/img/SystemIdentification/sisotool.png" srcset="/img/loading.gif" lazyload alt="sisotool"></p>
+<p>不同PID参数的仿真结果和实测结果如下：</p>
+<p><img src="/img/SystemIdentification/step_syscl_compare.svg" srcset="/img/loading.gif" lazyload alt=""></p>
+<p>从上图中可以看出，仿真的闭环系统阶跃响应和实测的闭环系统阶跃响应，无论在超调量还是调节时间上都相当接近，这也证明了系统辨识结果的正确性，也说明了利用仿真设计控制器的实际可行性。</p>
+<h2 id="4-云台系统辨识效果"><a href="#4-云台系统辨识效果" class="headerlink" title="4 云台系统辨识效果"></a>4 云台系统辨识效果</h2><h2 id="5-参考文献："><a href="#5-参考文献：" class="headerlink" title="5 参考文献："></a>5 参考文献：</h2><p>[1]<a target="_blank" rel="noopener" href="https://bbs.robomaster.com/forum.php?mod=viewthread&amp;tid=4941&amp;extra=&amp;page=1（主要参考的官方教程，本文中省略的细节都可以在该教程中找到）">https://bbs.robomaster.com/forum.php?mod=viewthread&amp;tid=4941&amp;extra=&amp;page=1（主要参考的官方教程，本文中省略的细节都可以在该教程中找到）</a></p>
+<p>[2]<a target="_blank" rel="noopener" href="https://blog.csdn.net/CCCDeric/article/details/112075279">https://blog.csdn.net/CCCDeric/article/details/112075279</a> （正弦信号的产生给了我很多灵感）</p>
+<p>[3]<a target="_blank" rel="noopener" href="https://blog.csdn.net/nicholas_duan/article/details/103251126">https://blog.csdn.net/nicholas_duan/article/details/103251126</a> （Keil中将数据导出的方法）</p>
+<p>[4]<a target="_blank" rel="noopener" href="https://ww2.mathworks.cn/help/signal/ug/practical-introduction-to-frequency-domain-analysis.html（利用FFT得到频率响应）">https://ww2.mathworks.cn/help/signal/ug/practical-introduction-to-frequency-domain-analysis.html（利用FFT得到频率响应）</a></p>
+<p>[5]<a target="_blank" rel="noopener" href="https://bbs.robomaster.com/thread-5059-1-1.html">https://bbs.robomaster.com/thread-5059-1-1.html</a> （官方利用matlab设计控制器的教程）</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/System-Identification/">System Identification</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/12/04/%E5%90%84%E7%A7%8D%E5%A7%BF%E6%80%81%E8%A7%A3%E7%AE%97%E6%96%B9%E6%B3%95%E7%9A%84%E6%AF%94%E8%BE%83/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">IMU各种姿态解算方法的实现与比较</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/12/01/%E5%85%A8%E7%8A%B6%E6%80%81%E5%8F%8D%E9%A6%88%E6%8E%A7%E5%88%B6%E7%8E%87LQR%E5%9C%A8%E7%94%B5%E6%9C%BA%E6%8E%A7%E5%88%B6%E6%96%B9%E9%9D%A2%E7%9A%84%E5%AE%9E%E9%99%85%E5%BA%94%E7%94%A8/">
+                        <span class="hidden-mobile">LQR最优控制在电机控制方面的实际应用</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;TOC</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        loader: {
+          load: ['ui/lazy']
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>

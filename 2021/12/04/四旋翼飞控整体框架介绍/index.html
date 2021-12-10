@@ -1,0 +1,691 @@
+
+
+<!DOCTYPE html>
+<html lang="en" data-default-color-scheme=auto>
+
+
+
+<head>
+  <meta charset="UTF-8">
+  <link rel="apple-touch-icon" sizes="76x76" href="/img/browser_tab.jpeg">
+  <link rel="icon" href="/img/browser_tab.jpeg">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  
+  <meta name="theme-color" content="#2f4154">
+  <meta name="description" content="本文的目的是作为大创知识交流的讲义。在大创中学习了很多四旋翼飞控的知识，写此文总结一下。">
+  <meta name="author" content="lqx">
+  <meta name="keywords" content="">
+  <meta name="description" content="本文的目的是作为大创知识交流的讲义。在大创中学习了很多四旋翼飞控的知识，写此文总结一下。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="四旋翼飞控整体框架介绍：建模、状态估计和控制">
+<meta property="og:url" content="http://example.com/2021/12/04/%E5%9B%9B%E6%97%8B%E7%BF%BC%E9%A3%9E%E6%8E%A7%E6%95%B4%E4%BD%93%E6%A1%86%E6%9E%B6%E4%BB%8B%E7%BB%8D/index.html">
+<meta property="og:site_name" content="Robotics and Astronomy by lqx">
+<meta property="og:description" content="本文的目的是作为大创知识交流的讲义。在大创中学习了很多四旋翼飞控的知识，写此文总结一下。">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://example.com/img/quadrotor/Eular%20Angle.png">
+<meta property="og:image" content="http://example.com/img/quadrotor/Kalman%20Filter.jpg">
+<meta property="og:image" content="http://example.com/img/quadrotor/Control%20Framework.png">
+<meta property="og:image" content="http://example.com/img/quadrotor/cl_control.png">
+<meta property="article:published_time" content="2021-12-04T12:24:04.669Z">
+<meta property="article:modified_time" content="2021-12-10T06:35:49.524Z">
+<meta property="article:author" content="lqx">
+<meta property="article:tag" content="Algorithum">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="http://example.com/img/quadrotor/Eular%20Angle.png">
+  
+  <title>四旋翼飞控整体框架介绍：建模、状态估计和控制 - Robotics and Astronomy by lqx</title>
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/css/bootstrap.min.css" />
+
+
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/github-markdown-css@4/github-markdown.min.css" />
+  <link  rel="stylesheet" href="/lib/hint/hint.min.css" />
+
+  
+    
+    
+      
+      <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@10/styles/github-gist.min.css" />
+    
+  
+
+  
+    <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.css" />
+  
+
+
+<!-- 主题依赖的图标库，不要自行修改 -->
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1749284_ba1fz6golrf.css">
+
+
+
+<link rel="stylesheet" href="//at.alicdn.com/t/font_1736178_kmeydafke9r.css">
+
+
+<link  rel="stylesheet" href="/css/main.css" />
+
+<!-- 自定义样式保持在最底部 -->
+
+
+  <script id="fluid-configs">
+    var Fluid = window.Fluid || {};
+    var CONFIG = {"hostname":"example.com","root":"/","version":"1.8.12","typing":{"enable":false,"typeSpeed":70,"cursorChar":"_","loop":false},"anchorjs":{"enable":true,"element":"h1,h2,h3,h4,h5,h6","placement":"right","visible":"hover","icon":""},"progressbar":{"enable":true,"height_px":3,"color":"#29d","options":{"showSpinner":false,"trickleSpeed":100}},"copy_btn":true,"image_zoom":{"enable":true,"img_url_replace":["",""]},"toc":{"enable":true,"headingSelector":"h1,h2,h3,h4,h5,h6","collapseDepth":0},"lazyload":{"enable":true,"loading_img":"/img/loading.gif","onlypost":false,"offset_factor":2},"web_analytics":{"enable":false,"baidu":null,"google":null,"gtag":null,"tencent":{"sid":null,"cid":null},"woyaola":null,"cnzz":null,"leancloud":{"app_id":null,"app_key":null,"server_url":null,"path":"window.location.pathname"}},"search_path":"/local-search.xml"};
+  </script>
+  <script  src="/js/utils.js" ></script>
+  <script  src="/js/color-schema.js" ></script>
+<!-- hexo injector head_end start -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.12.0/dist/katex.min.css">
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/hexo-math@4.0.0/dist/style.css">
+<!-- hexo injector head_end end --><meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+  <header style="height: 70vh;">
+    <nav id="navbar" class="navbar fixed-top  navbar-expand-lg navbar-dark scrolling-navbar">
+  <div class="container">
+    <a class="navbar-brand" href="/">
+      <strong>DK-L</strong>
+    </a>
+
+    <button id="navbar-toggler-btn" class="navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <div class="animated-icon"><span></span><span></span><span></span></div>
+    </button>
+
+    <!-- Collapsible content -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav ml-auto text-center">
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/">
+                <i class="iconfont icon-home-fill"></i>
+                Home
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/archives/">
+                <i class="iconfont icon-archive-fill"></i>
+                Archives
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/categories/">
+                <i class="iconfont icon-category-fill"></i>
+                Categories
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/tags/">
+                <i class="iconfont icon-tags-fill"></i>
+                Tags
+              </a>
+            </li>
+          
+        
+          
+          
+          
+          
+            <li class="nav-item">
+              <a class="nav-link" href="/about/">
+                <i class="iconfont icon-user-fill"></i>
+                About
+              </a>
+            </li>
+          
+        
+        
+          <li class="nav-item" id="search-btn">
+            <a class="nav-link" target="_self" href="javascript:;" data-toggle="modal" data-target="#modalSearch" aria-label="Search">
+              &nbsp;<i class="iconfont icon-search"></i>&nbsp;
+            </a>
+          </li>
+        
+        
+          <li class="nav-item" id="color-toggle-btn">
+            <a class="nav-link" target="_self" href="javascript:;" aria-label="Color Toggle">&nbsp;<i
+                class="iconfont icon-dark" id="color-toggle-icon"></i>&nbsp;</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+</nav>
+
+    <div class="banner" id="banner" parallax=true
+         style="background: url('/img/quadrotor/mavic3.png') no-repeat center center;
+           background-size: cover;">
+      <div class="full-bg-img">
+        <div class="mask flex-center" style="background-color: rgba(0, 0, 0, 0.3)">
+          <div class="page-header text-center fade-in-up">
+            <span class="h2" id="subtitle" title="四旋翼飞控整体框架介绍：建模、状态估计和控制">
+              
+                四旋翼飞控整体框架介绍：建模、状态估计和控制
+              
+            </span>
+
+            
+              <div class="mt-3">
+  
+  
+    <span class="post-meta">
+      <i class="iconfont icon-date-fill" aria-hidden="true"></i>
+      <time datetime="2021-12-04 20:24" pubdate>
+        December 4, 2021 pm
+      </time>
+    </span>
+  
+</div>
+
+<div class="mt-1">
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-chart"></i>
+      17k 字
+    </span>
+  
+
+  
+    <span class="post-meta mr-2">
+      <i class="iconfont icon-clock-fill"></i>
+      
+      
+      52 分钟
+    </span>
+  
+
+  
+  
+</div>
+
+            
+          </div>
+
+          
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    
+      
+
+<div class="container-fluid nopadding-x">
+  <div class="row nomargin-x">
+    <div class="d-none d-lg-block col-lg-2"></div>
+    <div class="col-lg-8 nopadding-x-md">
+      <div class="container nopadding-x-md" id="board-ctn">
+        <div class="py-5" id="board">
+          <article class="post-content mx-auto">
+            <!-- SEO header -->
+            <h1 style="display: none">四旋翼飞控整体框架介绍：建模、状态估计和控制</h1>
+            
+            <div class="markdown-body">
+              <h2 id="1-写在前面"><a href="#1-写在前面" class="headerlink" title="1 写在前面"></a>1 写在前面</h2><p>由于最近在做的一个大创项目中要用到四旋翼，便研究了一下关于四旋翼的相关理论，学着学着，萌生了记录一下整体框架的想法，以防之后遗忘。本文主要介绍四旋翼飞控的整体框架，从旋转表示法到动态模型的建立，再从状态估计到控制算法。四旋翼包含的理论和知识涵盖甚广，在一篇文章中包含所有的详细推导是不切实际的，因此本文的写作目的主要是：记录一下每个模块中的主要知识点和思想，以及不同模块之间的联系和交叉应用，达到心中“既有树木，又有森林”的效果。</p>
+<p>四旋翼主要包括以下模块：</p>
+<ul>
+<li>旋转表示法：欧拉角、旋转矩阵、四元数、轴-角表示法</li>
+<li>动态模型：运动学模型、动力学模型（牛顿第二定律—平移运动、欧拉方程—旋转运动）</li>
+<li>状态估计：测量模型（加速度计、陀螺仪、磁力计）、状态估计（互补滤波、卡尔曼滤波、Mahony滤波等）</li>
+<li>控制算法：位置控制、姿态控制、控制算法（PID）</li>
+</ul>
+<p>接下来会对以上模块分别进行介绍。</p>
+<h2 id="2-旋转表示法"><a href="#2-旋转表示法" class="headerlink" title="2 旋转表示法"></a>2 旋转表示法</h2><h3 id="2-1-动机-motivation"><a href="#2-1-动机-motivation" class="headerlink" title="2.1 动机(motivation)"></a>2.1 动机(motivation)</h3><p>旋转表示法是之后建立动态模型、确定状态估计方程、明确控制算法的基础，非常重要。之所以旋转表示法有如此重要的地位，是因为在之后的系统动态模型和控制模型中，都要在不同的坐标系之间进行转换，而搭起不同坐标系之间桥梁的就是坐标系之间的相对旋转，描述这种旋转就需要用到旋转表示法的知识。</p>
+<p>比如说，在系统的运动学模型和动力学模型中，同时包含有机体坐标系和地球固连坐标系。一方面，希望在地球固连坐标系下表示位置和速度，方便飞手的控制且与GPS的测量一致；同时我们希望在机体坐标系下表示拉力和力矩，这样不仅非常直观，且各种传感器的测量值也在机体坐标系下表示。这就需要我们可以描述同一个向量在两个坐标系下不同的表示之间的关系，一般可以通过欧拉角、旋转矩阵、四元数这三种方式表示，统称为旋转表示法。</p>
+<h3 id="2-2-关于坐标系"><a href="#2-2-关于坐标系" class="headerlink" title="2.2 关于坐标系"></a>2.2 关于坐标系</h3><p>在研究四旋翼时，我们一般会用到两个坐标系：<strong>机体坐标系</strong><script type="math/tex">o_bx_by_bz_b</script>和<strong>地球固连坐标系</strong><script type="math/tex">o_ex_ey_ez_e</script>。同一个向量<script type="math/tex">r</script>在两种坐标系下可能有不同的表示，一般我们记向量<script type="math/tex">r</script>在机体坐标系下的表示为<script type="math/tex">^{b}r</script>，在地球固连坐标系下的表示为<script type="math/tex">^{e}r</script>。旋转表示法解决的主要问题就是：<strong>同一个向量在两种坐标系下的表示有什么联系，我们怎样由其中的一中表示推出另外一种表示</strong>。</p>
+<h3 id="2-3-欧拉角"><a href="#2-3-欧拉角" class="headerlink" title="2.3 欧拉角"></a>2.3 欧拉角</h3><p>欧拉角是最直观的一种的旋转表示法，但是由于其使用三个参数来表示三个自由度的旋转，不可避免的会出现奇异性问题，即通常所说的“万向节死锁”，在俯仰角或滚转角接近90°时出现自由度退化的问题。</p>
+<p>本文统一采用<script type="math/tex">z-y-x</script>欧拉角，俯仰角Pitch、滚转角Roll、偏航角Yaw分别记做<script type="math/tex">\theta、\phi、\psi</script>，在地球固连坐标系旋转至机体坐标系的过程中，先沿地球固连坐标系的<script type="math/tex">z</script>轴旋转偏航角<script type="math/tex">\psi</script>，在沿新得到的临时机体坐标系的$y$轴旋转俯仰角<script type="math/tex">\theta</script>，最后沿第二次新得到的临时机体坐标系的<script type="math/tex">x</script>轴旋转滚转角<script type="math/tex">\phi</script>，最后得到机体坐标系。</p>
+<p><img src="/img/quadrotor/Eular Angle.png" srcset="/img/loading.gif" lazyload alt="Eular Angle"></p>
+<p>上述过程可以用三个矩阵来表示，分别为<script type="math/tex">\boldsymbol{R}_z(\psi)、\boldsymbol{R}_y(\theta)、\boldsymbol{R}_x(\phi)</script>：   $$\boldsymbol{R}_z(\psi) = \begin{pmatrix}cos\psi& sin\psi &0 \\ -sin\psi&cos\psi  &0 \\0 & 0 &1\end{pmatrix} =\boldsymbol{R}_e^k   $$     $$\boldsymbol{R}_y(\theta) = \begin{pmatrix}cos\theta& 0 &-sin\theta \\0  &1 \\sin\theta & 0 &cos\theta\end{pmatrix}=\boldsymbol{R}_k^n$$     $$\boldsymbol{R}_x(\phi) = \begin{pmatrix}1& 0 &0 \\ 0&cos\phi  &sin\phi \\ 0 & -sin\phi &cos\phi\end{pmatrix}=\boldsymbol{R}_n^b $$  </p>
+<p>上面三个矩阵可以采用线性变换的知识轻松得到，即：从坐标系1到坐标系2的线性变换对应的矩阵，由坐标系1的每一个基在坐标系2下的坐标构成。例如：<script type="math/tex">\boldsymbol{R}_b^e=[^e\boldsymbol{b}_1 \quad ^e\boldsymbol{b}_2 \quad^e\boldsymbol{b}_3]</script>。</p>
+<p>最终的姿态解算结果以及控制器的设计大部分是基于欧拉角进行的，之后会给出如何由旋转矩阵和四元数得到欧拉角。</p>
+<p>由上述的旋转过程和欧拉角的定义可以得到三个欧拉角的变化率和机体角速度的关系：$$\begin{pmatrix}\omega_{xb}\\\omega_{yb} \\\omega_{zb}\end{pmatrix} = \begin{pmatrix}1& 0 &-sin\theta \\0&cos\phi  &cos\theta sin\phi \\0 & -sin\phi &cos\theta cos\phi\end{pmatrix}\begin{pmatrix}\dot{\phi}\\\dot{\theta} \\\dot{\psi}\end{pmatrix}$$</p>
+<p>推导上式，考虑三个欧拉角坐标系<script type="math/tex">k、n、b</script>（即为旋转过程中的三个中间坐标系）即可。</p>
+<p>反之，有：$$\begin{pmatrix}\dot{\phi}\\\dot{\theta} \\\dot{\psi}\end{pmatrix} = \begin{pmatrix}1& tan\theta sin\phi &tan\theta cos\phi\\0&cos\phi  &-sin\phi \\0 & sin\phi / cos\theta&cos\phi /cos\theta\end{pmatrix}\begin{pmatrix}\omega_{xb}\\\omega_{yb} \\\omega_{zb}\end{pmatrix}$$      </p>
+<p>简记为：                                                                  $$\dot{\boldsymbol{\Theta}}=W \cdot \ ^b\boldsymbol{\omega}$$</p>
+<p>上面两个式子的意义在于，我们利用陀螺仪只能测出机体角速度在机体坐标系下的表示，即<script type="math/tex">\begin{pmatrix}\omega_{xb}&\omega_{yb} &\omega_{zb}\end{pmatrix}^T</script>，为了通过积分得到三个欧拉角，我们必须用上面的式子计算出三个欧拉角的变化率<script type="math/tex">\begin{pmatrix}\dot{\phi} & \dot{\theta} &\dot{\psi}\end{pmatrix}^T</script>，然后进行数值积分，计算出目前的欧拉角，即<script type="math/tex">\phi[n]=\phi[n-1]+\dot{\phi}\times \Delta t</script>，依次迭代，不断更新。</p>
+<h3 id="2-4-旋转矩阵"><a href="#2-4-旋转矩阵" class="headerlink" title="2.4 旋转矩阵"></a>2.4 旋转矩阵</h3><p>定义由坐标系1到坐标系2的旋转矩阵为<script type="math/tex">\boldsymbol{R}_1^2</script>，使用方法为<script type="math/tex">^{2}r=R_1^{2}\ ^{1}r</script>，即将向量在坐标系1下的坐标表示转换为在坐标系2下的坐标表示。</p>
+<p>由上述欧拉角的旋转过程可以推出从机体坐标系到地球固连坐标系的旋转矩阵<script type="math/tex">R_b^e</script>为：$$\boldsymbol{R}_b^e=(\boldsymbol{R}_e^b)^{-1}=\boldsymbol{R}_z^T(\psi)\boldsymbol{R}_y^T(\theta)\boldsymbol{R}_x^T(\phi)=\begin{pmatrix}cos\theta cos\phi & cos\psi sin\theta sin\phi-sin\psi cos\phi &cos\psi sin\theta cos\phi +sin\psi sin\phi \\ cos\theta sin\psi&sin\psi sin\theta sin\phi+cos\psi cos\phi  &sin\psi sin\theta cos\phi -cos\psi sin\phi \\-sin\theta & sin\phi  cos\theta&cos\phi cos\theta\end{pmatrix}$$   </p>
+<p>也可以由旋转矩阵求欧拉角，若记上述的旋转矩阵为：$$\boldsymbol{R}_b^e=\begin{pmatrix}r_{11}&r_{12}&r_{13}\\r_{21}&r_{22}&r_{23}\\r_{31}&r_{32}&r_{33}\end{pmatrix}$$</p>
+<p>则有：</p>
+<ul>
+<li><p>偏航角   <script type="math/tex">\psi=arctan\frac{r_{21}}{r_{11}}</script></p>
+</li>
+<li><p>俯仰角   <script type="math/tex">\theta = arcsin(-r_{31})</script></p>
+</li>
+<li><p>滚转角   <script type="math/tex">\phi = arctan\frac{r_{32}}{r_{33}}</script></p>
+</li>
+</ul>
+<p>由旋转矩阵的正交性，从地球固连坐标系到机体坐标系的旋转矩阵<script type="math/tex">R_e^b</script>为：</p>
+<p>​                                                                    $$\boldsymbol{R}_e^b=(\boldsymbol{R}_b^e)^{-1}=(\boldsymbol{R}_b^e)^T$$</p>
+<p>对旋转矩阵求逆只需要转置即可。</p>
+<p>不过也正是因为旋转矩阵的正交性带来了额外的约束，导致我们在利用非线性优化进行状态估计时出现了不必要的麻烦，所以我们一般利用接下来的四元数进行优化算法的设计。或者用更加高级的李群和李代数作为工具进行姿态估计，这也是SLAM中常用的做法，不过在四旋翼姿态解算中很少使用。</p>
+<p>旋转矩阵的导数为：$$\frac{d\boldsymbol{R}_b^e}{dt}=\boldsymbol{R}_b^e[^b\boldsymbol{\omega}]_{\times}$$</p>
+<p>展开为： $$\frac{d\boldsymbol{R}_b^e}{dt}=\boldsymbol{R}_b^e[^b\boldsymbol{\omega}]_{\times}=\begin{pmatrix}cos\theta cos\phi & cos\psi sin\theta sin\phi-sin\psi cos\phi &cos\psi sin\theta cos\phi +sin\psi sin\phi \\ cos\theta sin\psi&sin\psi sin\theta sin\phi+cos\psi cos\phi  &sin\psi sin\theta cos\phi -cos\psi sin\phi \\-sin\theta & sin\phi  cos\theta&cos\phi cos\theta\end{pmatrix}  \begin{pmatrix}0&-\omega_{zb}&\omega_{yb}\\\omega_{zb}&0& -\omega_{xb}\\-\omega_{yb}&\omega_{xb}&0\end{pmatrix}$$</p>
+<h3 id="2-5-四元数"><a href="#2-5-四元数" class="headerlink" title="2.5 四元数"></a>2.5 四元数</h3><p>单位四元数也可以用来表示旋转，具体理论在此不做过多介绍。</p>
+<p>假定地球固连坐标系到机体坐标系的旋转四元数为<script type="math/tex">\boldsymbol{q}_e^b=\begin{pmatrix}q_0 & q_1 &q_2&q_3\end{pmatrix}^T</script>，则有：$$\begin{pmatrix}0\\ ^{e}\boldsymbol{r}\end{pmatrix} =(\boldsymbol{q}_b^e)^{-1}\otimes \begin{pmatrix}0\\ ^{b}\boldsymbol{r}\end{pmatrix} \otimes\boldsymbol{q}_b^e =\boldsymbol{q}_e^b\otimes \begin{pmatrix}0\\ ^{b}\boldsymbol{r}\end{pmatrix} \otimes(\boldsymbol{q}_e^b)^{-1}$$</p>
+<p>由上式可得：                                          $$^{e}\boldsymbol{r}=\boldsymbol{C}(\boldsymbol{q}_e^b)\cdot \ ^{b}\boldsymbol{r}$$</p>
+<p>其中：         $$\boldsymbol{C}(\boldsymbol{q}_e^b)=\begin{pmatrix}q_0^2+q_1^2-q_2^2-q_3^2&2(q_1q_2-q_0q_3)&2(q_1q_3+q_0q_2)\\2(q_1q_2+q_0q_3)&q_0^2-q_1^2+q_2^2-q_3^2&2(q_2q_3-q_0q_1)\\2(q_1q_3-q_0q_2)&2(q_2q_3+q_0q_1)&q_0^2-q_1^2-q_2^2+q_3^2\end{pmatrix}$$</p>
+<p>上式可以看成是旋转矩阵的四元数表示，则根据由旋转矩阵求欧拉角的方法，可以得到由四元数求欧拉角的方法：</p>
+<ul>
+<li><p>偏航角   <script type="math/tex">\psi=arctan\frac{r_{21}}{r_{11}}=arctan\frac{2(q_1q_2+q_0q_3)}{q_0^2+q_1^2-q_2^2-q_3^2}</script></p>
+</li>
+<li><p>俯仰角   <script type="math/tex">\theta = arcsin(-r_{31})=arcsin(-2(q_1q_3-q_0q_2))</script></p>
+</li>
+<li><p>滚转角   <script type="math/tex">\phi = arctan\frac{r_{32}}{r_{33}}=arctan\frac{2(q_2q_3+q_0q_1)}{q_0^2-q_1^2-q_2^2+q_3^2}</script></p>
+</li>
+</ul>
+<p>在利用四元数进行优化时，四元数的导数是一个非常关键的信息，在迭代优化中起到非常重要的作用，幸运的是，四元数导数和机体角速度可以建立起关系：$$\dot{\boldsymbol{q}_e^b}=\frac{1}{2}\begin{pmatrix}0&-^{b}\boldsymbol{\omega}^T\\^{b}\boldsymbol{\omega}&-[^{b}\boldsymbol{\omega}]_{\times}\end{pmatrix}\boldsymbol{q}_e^b$$</p>
+<p>即：$$\dot{\boldsymbol{q}_e^b}=\frac{1}{2}\begin{pmatrix}0&-\omega_{xb}&-\omega_{yb}&-\omega_{zb} \\\omega_{xb}&0&\omega_{zb}&-\omega_{yb}\\\omega_{yb}&-\omega_{zb}&0& \omega_{xb}\\\omega_{zb}&\omega_{yb}&-\omega_{xb}&0\end{pmatrix}\begin{pmatrix}q_0 \\ q_1 \\q_2\\q_3\end{pmatrix}$$</p>
+<p>在Mahony姿态解算算法中，就是在修正过陀螺仪得到的机体角速度之后，利用上式计算四元数导数，以修正当前的四元数，不断迭代估计当前姿态。</p>
+<h2 id="3-模型建立"><a href="#3-模型建立" class="headerlink" title="3 模型建立"></a>3 模型建立</h2><h3 id="3-1-运动学模型"><a href="#3-1-运动学模型" class="headerlink" title="3.1 运动学模型"></a>3.1 运动学模型</h3><p>运动学模型分为平移和旋转两个方面。</p>
+<p>对于刚体，我们在讨论<strong>平移</strong>运动时只考虑重心的平移运动，记四旋翼的重心向量为<script type="math/tex">^e\boldsymbol{p}</script>，多旋翼的重心速度为<script type="math/tex">^e\boldsymbol{v}</script>，</p>
+<p>则有：                                                                     $$^e\dot{\boldsymbol{p}}\ = \ ^e\boldsymbol{v}$$</p>
+<p>上式即为位置的导数等于速度，很简单。</p>
+<p>在讨论<strong>旋转</strong>或者说姿态运动学模型时，根据我们选用的旋转表示法的不同，可以分为三种模型：</p>
+<ul>
+<li>欧拉角模型： <script type="math/tex">\dot{\boldsymbol{\Theta}}=W \cdot \ ^b\boldsymbol{\omega}</script></li>
+<li>旋转矩阵模型：<script type="math/tex">\frac{d\boldsymbol{R}_b^e}{dt}=\boldsymbol{R}_b^e[^b\boldsymbol{\omega}]_{\times}</script></li>
+<li>四元数模型：  <script type="math/tex">\dot{\boldsymbol{q}_e^b}=\frac{1}{2}\begin{pmatrix}0&-^{b}\boldsymbol{\omega}^T\\^{b}\boldsymbol{\omega}&-[^{b}\boldsymbol{\omega}]_{\times}\end{pmatrix}\boldsymbol{q}_e^b</script></li>
+</ul>
+<h3 id="3-2-刚体动力学模型"><a href="#3-2-刚体动力学模型" class="headerlink" title="3.2 刚体动力学模型"></a>3.2 刚体动力学模型</h3><p>动力学模型同样分为平移和旋转两个方面，我们分别称为位置动力学模型和姿态动力学模型。</p>
+<p><strong>前置知识：</strong></p>
+<p>在讨论位置动力学模型时，我们使用的主要工具是牛顿第二定律：$$\boldsymbol{F}=m\boldsymbol{a}$$</p>
+<p>在讨论姿态动力学模型时，我们使用的主要工具是欧拉方程（<script type="math/tex">Eular \ equation</script>）:</p>
+<p>固定坐标系下：                                               $$^G\boldsymbol{M}=\frac{^Gd}{dt} \ ^G\boldsymbol{L}$$</p>
+<p>机体坐标系下：        $$^B\boldsymbol{M}=\frac{^Gd}{dt} \ ^B\boldsymbol{L} \ = \ ^B\dot{\boldsymbol{L}} + \ ^B_G\boldsymbol{\omega}_B \times ^B\boldsymbol{L}= \ ^BI \ ^B_G\dot{\boldsymbol{\omega}}_B \ + \ ^B_G\boldsymbol{\omega}_B\times(^BI \ ^B_G\boldsymbol{\omega}_B)$$</p>
+<p>在讨论同一个向量在不同坐标系下的导数时，我们有如下关系：$$ \frac{^Gd}{dt} \ ^B\Box \ = \ \frac{^Bd}{dt} \ ^B\Box + \ ^B_G\boldsymbol{\omega}_B \times ^B\Box$$</p>
+<p><strong>四旋翼的刚体动力学模型：</strong></p>
+<p><strong>位置动力学模型：</strong></p>
+<p>在地球固连坐标系下，根据牛顿第二定律，我们有：$$^e\dot{\boldsymbol{v}}\ = \ g\boldsymbol{e}_3 - \frac{f}{m} ^e\boldsymbol{b}_3 $$</p>
+<p>上式中，<script type="math/tex">f</script>为螺旋桨产生的总拉力，易知拉力始终在机体坐标系的z轴方向，因而在地球固连坐标系看来，方向不断变化，且和飞行器的姿态有关，由上文可知，<script type="math/tex">^e\boldsymbol{b}_3 = \boldsymbol{R}_b^e\boldsymbol{e}_3</script>，</p>
+<p>所以可以得到最终结果：                            $$^e\dot{\boldsymbol{v}}\ = \ g\boldsymbol{e}_3 - \frac{f}{m} \boldsymbol{R}_b^e\boldsymbol{e}_3 $$  </p>
+<p>其实一句话概括，就是我们把机体坐标系下的拉力矢量转化为世界坐标系下的表示，再在世界坐标系下应用牛顿第二定律。</p>
+<p><strong>姿态动力学模型：</strong></p>
+<p>根据欧拉方程，我们有：                 $$^b\tau_{total}=J\cdot \ ^b\dot{\boldsymbol{\omega}}+ \ ^b\boldsymbol{\omega}\times(J\cdot \ ^b\boldsymbol{\omega})$$</p>
+<p>其中<script type="math/tex">^b\tau_{total}</script>为四旋翼所受力矩在机体坐标系下的表示，主要有两个部分：螺旋桨在机体轴上产生的力矩<script type="math/tex">\tau</script>以及陀螺力矩<script type="math/tex">G_a</script>。</p>
+<h3 id="3-3-模型小结"><a href="#3-3-模型小结" class="headerlink" title="3.3 模型小结"></a>3.3 模型小结</h3><p>整体而言，四旋翼的飞行控制刚体模型可以被概括为下面四个式子：</p>
+<ul>
+<li>运动学位置模型：<script type="math/tex">^e\dot{\boldsymbol{p}}\ = \ ^e\boldsymbol{v}</script></li>
+<li>运动学姿态模型：</li>
+<li>欧拉角模型： <script type="math/tex">\dot{\boldsymbol{\Theta}}=W \cdot \ ^b\boldsymbol{\omega}</script><ul>
+<li>旋转矩阵模型：<script type="math/tex">\frac{d\boldsymbol{R}_b^e}{dt}=\boldsymbol{R}_b^e[^b\boldsymbol{\omega}]_{\times}</script></li>
+</ul>
+</li>
+<li>四元数模型：  <script type="math/tex">\dot{\boldsymbol{q}_e^b}=\frac{1}{2}\begin{pmatrix}0&-^{b}\boldsymbol{\omega}^T\\^{b}\boldsymbol{\omega}&-[^{b}\boldsymbol{\omega}]_{\times}\end{pmatrix}\boldsymbol{q}_e^b</script></li>
+<li>动力学位置模型： <script type="math/tex">^e\dot{\boldsymbol{v}}\ = \ g\boldsymbol{e}_3 - \frac{f}{m} \boldsymbol{R}_b^e\boldsymbol{e}_3</script>  </li>
+<li>动力学姿态模型：<script type="math/tex">^b\tau + \ ^bG_a=J\cdot \ ^b\dot{\boldsymbol{\omega}}+ \ ^b\boldsymbol{\omega}\times(J\cdot \ ^b\boldsymbol{\omega})</script></li>
+</ul>
+<p>在系统的运动学模型和动力学模型中，同时包含有机体坐标系和地球固连坐标系。一方面，希望在<strong>地球固连坐标系下表示位置和速度</strong>，方便飞手的控制且与GPS的测量一致；同时我们希望<strong>在机体坐标系下表示拉力和力矩</strong>，这样不仅非常直观，且各种传感器的测量值也在机体坐标系下表示。</p>
+<h2 id="4-状态估计"><a href="#4-状态估计" class="headerlink" title="4 状态估计"></a>4 状态估计</h2><h3 id="4-1-传感器测量模型"><a href="#4-1-传感器测量模型" class="headerlink" title="4.1 传感器测量模型"></a>4.1 传感器测量模型</h3><p><strong>加速度计：</strong></p>
+<p>利用加速度计可以测量机体的俯仰角和滚转角，若记<script type="math/tex">^{b}\boldsymbol{a}=\begin{pmatrix}a_{xb} & a_{yb} &a_{zb}\end{pmatrix}^T</script>为加速度计的测量值，即加速度矢量在机体坐标系下的表示，则机体的俯仰角和滚转角为：</p>
+<ul>
+<li><p>俯仰角：<script type="math/tex">\theta_{a}=arcsin(\frac{a_{xb}}{g})</script></p>
+</li>
+<li><p>滚转角：<script type="math/tex">\phi_a=-arcsin(\frac{a_{yb}}{gcos\theta_a})</script></p>
+</li>
+</ul>
+<p>加速度计没有累积误差，但动态响应特性较差，测量噪声较大。                      </p>
+<p><strong>陀螺仪：</strong></p>
+<p>陀螺仪可以测量机体角速度在机体坐标系下的表示，测量值可记为<script type="math/tex">^{b}\boldsymbol{\omega}=\begin{pmatrix}\omega_{xb} & \omega_{yb} &\omega_{zb}\end{pmatrix}^T</script>。</p>
+<p>在小角度的情况下，三个欧拉角的变化率近似等于机体角速度在机体坐标系下的表示，此时直接对机体角速度进行离散积分即可得到三个欧拉角。</p>
+<p>但当进行大角度飞行时，必须先由<script type="math/tex">\begin{pmatrix}\dot{\phi}\\\dot{\theta} \\\dot{\psi}\end{pmatrix} = \begin{pmatrix}1& tan\theta sin\phi &tan\theta cos\phi\\0&cos\phi  &-sin\phi \\0 & sin\phi / cos\theta&cos\phi /cos\theta\end{pmatrix}\begin{pmatrix}\omega_{xb}\\\omega_{yb} \\\omega_{zb}\end{pmatrix}</script>得到三个欧拉角的变化率，然后再对三个欧拉角的变化率分别进行离散积分，才能得到正确的欧拉角。</p>
+<p>陀螺仪动态响应快，测量精度高，但是在积分得到角度的过程中不可避免的会产生累积误差。</p>
+<p><strong>磁力计：</strong></p>
+<p>磁力计可以测出地磁场在机体坐标系下的坐标：<script type="math/tex">^{b}\boldsymbol{m}=\begin{pmatrix}m_{xb} & m_{yb} &m_{zb}\end{pmatrix}^T</script>，在得到偏航角角时。必须先利用之前得到的俯仰角和滚转角将磁力计测量值投影到水平面，得到：</p>
+<ul>
+<li>x轴分量：<script type="math/tex">\overline{m}_{xe}=m_{xb}cos\theta+m_{yb}sin\phi sin\theta+m_{zb}cos\phi sin\theta</script></li>
+<li>y轴分量：<script type="math/tex">\overline{m}_{ye}=m_{yb}cos\phi -m_{zb}sin\phi</script></li>
+</ul>
+<p>之后可以得到偏航角：                   $$\psi_{mag}=arctan2(\overline{m}_{xe},\overline{m}_{ye})$$  </p>
+<p>磁力计没有累积误差，但动态响应特性较差，测量噪声较大，且容易受到干扰。</p>
+<h3 id="4-2-互补滤波"><a href="#4-2-互补滤波" class="headerlink" title="4.2 互补滤波"></a>4.2 互补滤波</h3><p>简单来说，互补滤波就是对加速度计和磁力计解算得到的数据进行低通滤波，对陀螺仪解算得到的数据进行高通滤波。既可以保留加速度计和磁力计解算得到的数据无漂移的优势保留，也可以将陀螺仪解算得到的数据噪声小的优势保留下来。</p>
+<p>以俯仰角为例，互补滤波的一般形式为：$$\hat{\theta}(k)=\frac{\tau}{\tau+T_s}(\hat{\theta}(k-1)+T_s\omega_{yb}(k))+\frac{T_s}{\tau+T_s}\theta_{a}(k)$$</p>
+<p>一般系数取为0.95和0.05，则实际中的形式一般为：$$\hat{\theta}(k)=0.95(\hat{\theta}(k-1)+T_s\omega_{yb}(k))+0.05\theta_{a}(k)$$</p>
+<p>滚转角和俯仰角也是同理。</p>
+<h3 id="4-3-卡尔曼滤波"><a href="#4-3-卡尔曼滤波" class="headerlink" title="4.3 卡尔曼滤波"></a>4.3 卡尔曼滤波</h3><p>卡尔曼滤波器的主要作用是从一系列不完全且包含噪声不确定性的观测量中，估计系统的未知状态，其估计精度往往比单纯的基于单一观测量的方法更高。卡尔曼滤波器算法主要分两步处理，预测步骤和校正步骤。在预测步骤中，卡尔曼滤波器产生当前状态变量的预测估计，这些估计量包含不确定性。一旦出现下一个观测量（伴随着一定的误差以及随机噪声），之前的估计量会以加权平均的方式更新。</p>
+<p><img src="/img/quadrotor/Kalman Filter.jpg" srcset="/img/loading.gif" lazyload alt="Kalman Filter" style="zoom: 33%;" /></p>
+<h3 id="4-4-Mahony四元数解算"><a href="#4-4-Mahony四元数解算" class="headerlink" title="4.4 Mahony四元数解算"></a>4.4 Mahony四元数解算</h3><p>Mahony滤波算法整体来看，可以分为以下几步：</p>
+<ul>
+<li>根据目前估计的四元数，将机体坐标系下的磁力计数据转换到地球固连坐标系下，得到水平方向标准磁场方向</li>
+<li>将标准磁场方向和重力加速度方向利用当前估计的四元数再转换到机体坐标系下</li>
+<li>将测量的加速度和磁场方向在机体坐标系下的值和上一步中转换出的值求误差(叉积)，反映当前估计四元数的不准确程度</li>
+<li>利用PID将求得的误差用于修正陀螺仪测得的机体角速度</li>
+<li>利用机体角速度得到四元数导数，利用四元数导数更新当前估计的四元数，不断迭代修正四元数的估计值</li>
+<li>将实时估计的四元数转换成欧拉角实时输出</li>
+</ul>
+<p>总结一下，其实整个算法可以看做两大步：<strong>计算误差和修正估计</strong>。算法基于四元数进行优化估计。</p>
+<h4 id="4-4-1-Mahony误差计算"><a href="#4-4-1-Mahony误差计算" class="headerlink" title="4.4.1 Mahony误差计算"></a>4.4.1 Mahony误差计算</h4><p>误差估计的核心思想在于：地球固连坐标系<script type="math/tex">O_ex_ey_ez_e</script>中，加速度向量归一化的值为<script type="math/tex">\begin{pmatrix}0 & 0 &1\end{pmatrix}^T</script>，即只有向下的1g的重力加速度；磁力计测量的数据在地球固连坐标系中为<script type="math/tex">\begin{pmatrix}h_x & 0 &h_z\end{pmatrix}^T</script>，即只在x和z方向有值。上面描述的是理想值，理论上我们如果将上面的两个向量利用四元数转换到机体坐标系下，得到的值应当与加速度计和磁力计测量的值相等，但实际情况中两个值肯定不相等，我们就要计算出这两者之间的误差，利用这个误差进行下一步的修正。</p>
+<p>具体步骤为：</p>
+<p><strong>（1）将加速度计和磁力计测得的值归一化：</strong></p>
+<p>归一化之后加速度计测得的加速度在机体坐标系下的值记为<script type="math/tex">^{b}\boldsymbol{a}=\begin{pmatrix}a_{xb} & a_{yb} &a_{zb}\end{pmatrix}^T</script>，磁力计测得的磁场数据在机体坐标系下的值记为<script type="math/tex">^{b}\boldsymbol{m}=\begin{pmatrix}m_{xb} & m_{yb} &m_{zb}\end{pmatrix}^T</script></p>
+<p><strong>（2）求取地球固连坐标系下的参考加速度和磁场方向：</strong></p>
+<p>将测得的磁场方向在机体坐标系下的值转换到地球固连坐标系下：$$^{e}\boldsymbol{m}=\begin{pmatrix}m_{xe} \\ m_{ye} \\ m_{ze}\end{pmatrix}=\boldsymbol{C}(\boldsymbol{q}_e^b)\begin{pmatrix}m_{xb} \\ m_{yb} \\ m_{zb}\end{pmatrix}=\begin{pmatrix}q_0^2+q_1^2-q_2^2-q_3^2&2(q_1q_2-q_0q_3)&2(q_1q_3+q_0q_2)\\2(q_1q_2+q_0q_3)&q_0^2-q_1^2+q_2^2-q_3^2&2(q_2q_3-q_0q_1)\\2(q_1q_3-q_0q_2)&2(q_2q_3+q_0q_1)&q_0^2-q_1^2-q_2^2+q_3^2\end{pmatrix}\begin{pmatrix}m_{xb} \\ m_{yb} \\ m_{zb}\end{pmatrix}$$</p>
+<p>计算<script type="math/tex">^{e}\boldsymbol{m}</script>在水平和竖直方向上的投影：<script type="math/tex">h_{xe}=\sqrt{m_{xe}^2+m_{ye}^2}，h_{ze}=m_{ze}</script></p>
+<p>则磁场方向在地球固连坐标系下的理想参考方向为<script type="math/tex">^{e}\boldsymbol{h}_r=\begin{pmatrix}h_{xe} & 0 &h_{ze}\end{pmatrix}^T</script>。</p>
+<p>加速度在地球固连坐标系下的理想参考方向为<script type="math/tex">^{e}\boldsymbol{a}_r=\begin{pmatrix}0 & 0&1\end{pmatrix}^T</script>，即为重力加速度。</p>
+<p><strong>（3）将地球固连坐标系下的参考加速度和磁场方向转换到机体坐标系下：</strong></p>
+<p>磁场方向在机体坐标系下的理想参考值为：$$^{b}\boldsymbol{h}_r=\begin{pmatrix}h^r_{xb} \\ h^r_{yb} \\ h^r_{zb}\end{pmatrix}=(\boldsymbol{C}(\boldsymbol{q}_e^b))^T\begin{pmatrix}h_{xe} \\ 0 \\ h_{ze}\end{pmatrix}=\begin{pmatrix}q_0^2+q_1^2-q_2^2-q_3^2&2(q_1q_2+q_0q_3)&2(q_1q_3-q_0q_2)\\2(q_1q_2-q_0q_3)&q_0^2-q_1^2+q_2^2-q_3^2&2(q_2q_3+q_0q_1)\\2(q_1q_3+q_0q_2)&2(q_2q_3-q_0q_1)&q_0^2-q_1^2-q_2^2+q_3^2\end{pmatrix}\begin{pmatrix}h_{xe} \\ 0 \\ h_{ze}\end{pmatrix}$$</p>
+<p>加速度在机体坐标系下的理想参考值为：$$^{b}\boldsymbol{a}_r=\begin{pmatrix}a^r_{xb} \\a^r_{yb} \\ a^r_{zb}\end{pmatrix}=(\boldsymbol{C}(\boldsymbol{q}_e^b))^T\begin{pmatrix}0 \\ 0 \\ 1\end{pmatrix}=\begin{pmatrix}q_0^2+q_1^2-q_2^2-q_3^2&2(q_1q_2+q_0q_3)&2(q_1q_3-q_0q_2)\\2(q_1q_2-q_0q_3)&q_0^2-q_1^2+q_2^2-q_3^2&2(q_2q_3+q_0q_1)\\2(q_1q_3+q_0q_2)&2(q_2q_3-q_0q_1)&q_0^2-q_1^2-q_2^2+q_3^2\end{pmatrix}\begin{pmatrix}0 \\ 0 \\ 1\end{pmatrix}$$</p>
+<p><strong>（4）利用叉积计算加速度和磁场方向在机体坐标系下测量值和理想参考值之间的误差：</strong></p>
+<p>误差为：$$^{b}\boldsymbol{e}= \ ^{b}\boldsymbol{m}\times \ ^{b}\boldsymbol{h}_r+ \ ^{b}\boldsymbol{a}\times\ ^{b}\boldsymbol{a}_r$$</p>
+<p>即： $$\begin{pmatrix}e_{x} \\ e_{y} \\ e_{z}\end{pmatrix}=\begin{pmatrix}m_{yb}h^r_{zb}-m_{zb}h^r_{yb} \\ m_{zb}h^r_{xb}-m_{xb}h^r_{zb}\\ m_{xb}h^r_{yb}-m_{yb}h^r_{xb}\end{pmatrix}+\begin{pmatrix}a_{yb}a^r_{zb}-a_{zb}a^r_{yb} \\ a_{zb}a^r_{xb}-a_{xb}a^r_{zb}\\ a_{xb}a^r_{yb}-a_{yb}a^r_{xb}\end{pmatrix}$$</p>
+<h4 id="4-4-2-Mahony修正估计"><a href="#4-4-2-Mahony修正估计" class="headerlink" title="4.4.2 Mahony修正估计"></a>4.4.2 Mahony修正估计</h4><p><strong>（1）利用误差修正陀螺仪测量的机体角速度：</strong></p>
+<p>陀螺仪测得的机体角速度在机体坐标系下的值记为<script type="math/tex">^{b}\boldsymbol{\omega}^m=\begin{pmatrix}\omega^m_{xb} & \omega^m_{yb} &\omega^m_{zb}\end{pmatrix}^T</script>，修正过后的值记为<script type="math/tex">^{b}\boldsymbol{\omega}=\begin{pmatrix}\omega_{xb} & \omega_{yb} &\omega_{zb}\end{pmatrix}^T</script>。</p>
+<p>则修正利用误差项通过<strong>PID</strong>进行：$$^{b}\boldsymbol{\omega}= \ ^{b}\boldsymbol{\omega}^m+K_p\times  \ ^{b}\boldsymbol{e}+K_i\times \int \ ^{b}\boldsymbol{e}  $$</p>
+<p><strong>（2）利用修正过的机体角速度计算四元数导数：</strong>$$\dot{\boldsymbol{q}_e^b}=\frac{1}{2}\begin{pmatrix}0&-\omega_{xb}&-\omega_{yb}&-\omega_{zb} \\\omega_{xb}&0&\omega_{zb}&-\omega_{yb}\\\omega_{yb}&-\omega_{zb}&0& \omega_{xb}\\\omega_{zb}&\omega_{yb}&-\omega_{xb}&0\end{pmatrix}\begin{pmatrix}q_0 \\ q_1 \\q_2\\q_3\end{pmatrix}$$</p>
+<p><strong>（3）利用四元数导数更新四元数的估计值：</strong> $$\boldsymbol{q}_e^b[n] = \boldsymbol{q}_e^b[n-1] +T_s\times \dot{\boldsymbol{q}_e^b}$$           </p>
+<p>上式中<script type="math/tex">T_s</script>为采样间隔。  </p>
+<h2 id="5-控制算法"><a href="#5-控制算法" class="headerlink" title="5 控制算法"></a>5 控制算法</h2><h3 id="5-1-控制框架"><a href="#5-1-控制框架" class="headerlink" title="5.1 控制框架"></a>5.1 控制框架</h3><p>整体飞行控制框架如下图：</p>
+<p><img src="/img/quadrotor/Control Framework.png" srcset="/img/loading.gif" lazyload alt="Control Framework" style="zoom:50%;" /></p>
+<p>四旋翼的底层控制主要有四个方面，位置控制、姿态控制、控制分配和电机控制：</p>
+<ul>
+<li>位置控制：利用期望的位置<script type="math/tex">\boldsymbol{p}_d</script>解算出期望的滚转角<script type="math/tex">\phi_d</script>、期望的俯仰角<script type="math/tex">\theta_d</script>和期望的总拉力<script type="math/tex">f_d</script></li>
+<li>姿态控制：利用期望的姿态角<script type="math/tex">\phi_d、\theta_d、\psi_d</script>解​出期望的力矩<script type="math/tex">\boldsymbol{\tau}_d</script></li>
+<li>控制分配：为了得到合适的<script type="math/tex">f_d</script>和<script type="math/tex">\boldsymbol{\tau}_d</script>，需要将期望的螺旋桨转速分配到四个电机</li>
+<li>电机控制：利用每个电机的期望螺旋桨转速得到每个电机的期望油门指令</li>
+</ul>
+<p>本文中主要讨论位置控制和姿态控制。</p>
+<p>四旋翼的闭环控制框图如下图所示：</p>
+<p><img src="/img/quadrotor/cl_control.png" srcset="/img/loading.gif" lazyload alt="cl_control" style="zoom:67%;" /></p>
+<p>多旋翼是一个欠驱动系统，有六个输出（位置<script type="math/tex">\boldsymbol{p}\in\Re^3</script>和姿态<script type="math/tex">\boldsymbol{\Theta}\in\Re^3</script>），但只有四个独立输入（总拉力<script type="math/tex">f\in\Re</script>和三轴力矩<script type="math/tex">\boldsymbol{\tau}\in\Re^3</script>）。所以多旋翼只能跟踪四个期望指令（<script type="math/tex">\boldsymbol{p}_d\in\Re^3</script>和<script type="math/tex">\psi_d\in\Re</script>），剩余的变量（<script type="math/tex">\phi_d,\theta_d\in\Re</script>）由期望指令<script type="math/tex">\boldsymbol{p}_d</script>和<script type="math/tex">\psi_d</script>确定。</p>
+<h3 id="5-2-简化的线性模型"><a href="#5-2-简化的线性模型" class="headerlink" title="5.2 简化的线性模型"></a>5.2 简化的线性模型</h3><p>上面建立的模型中，忽略陀螺力矩和<script type="math/tex">^b\boldsymbol{\omega}\times(J\cdot \ ^b\boldsymbol{\omega})</script>，得到如下的简化模型：</p>
+<ul>
+<li>运动学位置模型：<script type="math/tex">^e\dot{\boldsymbol{p}}\ = \ ^e\boldsymbol{v}</script></li>
+<li>运动学姿态模型： <script type="math/tex">\dot{\boldsymbol{\Theta}}=W \cdot \ ^b\boldsymbol{\omega}</script>（欧拉角模型）</li>
+<li>动力学位置模型： <script type="math/tex">^e\dot{\boldsymbol{v}}\ = \ g\boldsymbol{e}_3 - \frac{f}{m} \boldsymbol{R}_b^e\boldsymbol{e}_3</script>  </li>
+<li>动力学姿态模型：<script type="math/tex">^b\tau  =J\cdot \ ^b\dot{\boldsymbol{\omega}}</script></li>
+</ul>
+<p>上面的模型还是一个非线性模型，需要进一步线性化：</p>
+<p>我们假设四旋翼的俯仰角和滚转角都非常小，总拉力约等于四旋翼的重力，则</p>
+<ul>
+<li>运动学姿态模型中的<script type="math/tex">W</script>近似为单位阵<script type="math/tex">I_3</script>，</li>
+<li>动力学位置模型中的<script type="math/tex">\boldsymbol{R}_b^e\boldsymbol{e}_3</script>近似为：<script type="math/tex">\boldsymbol{R}_b^e\boldsymbol{e}_3\approx \begin{pmatrix}\theta cos\psi+\phi sin\psi \\ \theta sin\psi-\phi cos\psi \\ 1\end{pmatrix}</script></li>
+</ul>
+<p>最终，原始模型可以被解耦为三个线性模型，即水平位置通道模型、高度通道模型和姿态模型：</p>
+<ul>
+<li><p>水平位置通道模型：                                     </p>
+<script type="math/tex; mode=display">\dot{\boldsymbol{p}}_h=\boldsymbol{v}_h</script><script type="math/tex; mode=display">\dot{\boldsymbol{v}}_h=-g\begin{pmatrix}sin\psi&cos\psi\\-cos\psi&sin\psi\end{pmatrix}\begin{pmatrix}\phi\\\theta\end{pmatrix}=-g\boldsymbol{A}_{\psi}\boldsymbol{\Theta}_{h}</script></li>
+<li><p>高度通道模型：                                         </p>
+<p>​     <script type="math/tex">\dot{p}_z=v_z</script></p>
+<script type="math/tex; mode=display">\dot{v}_z=g-\frac{f}{m}</script></li>
+<li><p>姿态模型：                                                 </p>
+<p>​      <script type="math/tex">\dot{\boldsymbol{\Theta}}=\ ^b\boldsymbol{\omega}</script></p>
+<script type="math/tex; mode=display">^b\tau  =J\cdot \ ^b\dot{\boldsymbol{\omega}}</script></li>
+</ul>
+<h3 id="5-3-位置控制"><a href="#5-3-位置控制" class="headerlink" title="5.3 位置控制"></a>5.3 位置控制</h3><p>本文只讨论欧拉角作为输出时的位置控制：</p>
+<p><strong>水平位置通道：</strong></p>
+<p>控制器为双环PID，分为位置环和速度环：</p>
+<p>位置环：针对<script type="math/tex">\dot{\boldsymbol{p}}_h=\boldsymbol{v}_h</script>，期望的水平速度为<script type="math/tex">\boldsymbol{v}_{hd}=\boldsymbol{K_{p}}  (\boldsymbol{p}_{hd}-\boldsymbol{p}_h)=\boldsymbol{K_{p}}  \boldsymbol{e}_{ph}</script>，仅有比例项控制即可。</p>
+<p>速度环：针对<script type="math/tex">\dot{\boldsymbol{v}}_h=-g\boldsymbol{A}_{\psi}\boldsymbol{\Theta}_{h}</script>，若期望的姿态为<script type="math/tex">\boldsymbol{\Theta}_{hd}</script>，则可令<script type="math/tex">-g\boldsymbol{A}_{\psi}\boldsymbol{\Theta}_{hd}=\boldsymbol{K_{p}}  \boldsymbol{e}_{vh}+\boldsymbol{K_{i}}  \int\boldsymbol{e}_{vh}+\boldsymbol{K_{d}}  \dot{\boldsymbol{e}}_{vh}</script>，之后从上式中解出期望的姿态<script type="math/tex">\boldsymbol{\Theta}_{hd}</script>即可。</p>
+<p>水平位置通道的输出为姿态的期望值<script type="math/tex">\boldsymbol{\Theta}_{hd}</script>，之后会将该值作为姿态控制的参考输入。</p>
+<p><strong>高度通道：</strong></p>
+<p>控制器为双环PID，分为位置环和速度环：</p>
+<p>位置环：针对<script type="math/tex">\dot{p}_z=v_z</script>，期望的竖直速度为<script type="math/tex">v_{zd}=K_p e_z</script>，为最简单的比例控制。</p>
+<p>速度环：针对<script type="math/tex">\dot{v}_z=g-\frac{f}{m}</script>，若期望的拉力为<script type="math/tex">f_d</script>，则可以令<script type="math/tex">g-\frac{f_d}{m}=K_pe_{vz}+K_i\int e_{vz}+K_d\dot{e}_{vz}</script>，之后从上式中解出期望的拉力<script type="math/tex">f_d</script>即可。</p>
+<p>高度通道的输出为拉力的期望值<script type="math/tex">f_d</script>，之后会将该值作为控制分配的参考输入。</p>
+<h3 id="5-4-姿态控制"><a href="#5-4-姿态控制" class="headerlink" title="5.4 姿态控制"></a>5.4 姿态控制</h3><p>本文只讨论基于欧拉角的姿态控制：</p>
+<p>控制器为双环PID，分为角度环和角速度环：</p>
+<p>角度环：针对<script type="math/tex">\dot{\boldsymbol{\Theta}}=\ ^b\boldsymbol{\omega}</script>，设计角速度的期望为<script type="math/tex">\ ^b\boldsymbol{\omega}_d=\boldsymbol{K}_{p}\boldsymbol{e}_{\boldsymbol{\Theta}}</script>，仅有比例控制。</p>
+<p>角速度环：针对<script type="math/tex">^b\tau  =J\cdot \ ^b\dot{\boldsymbol{\omega}}</script>，设计期望的力矩为<script type="math/tex">^b\tau_d=\boldsymbol{K_{p}}  \boldsymbol{e}_{\omega}+\boldsymbol{K_{i}}  \int\boldsymbol{e}_{\omega}+\boldsymbol{K_{d}}  \dot{\boldsymbol{e}}_{\omega}</script></p>
+<p>姿态控制的输出为力矩的期望值<script type="math/tex">^b\tau_d</script>，之后会将该值作为控制分配的参考输入。</p>
+<h2 id="6-总结"><a href="#6-总结" class="headerlink" title="6 总结"></a>6 总结</h2><h2 id="7-参考文献"><a href="#7-参考文献" class="headerlink" title="7 参考文献"></a>7 参考文献</h2><p>[1] 《多旋翼飞行器设计与控制》全权  （一本非常全面的关于四旋翼的书籍）</p>
+<p>[2] 《Advanced Dynamics : Rigid Body,Multibody,and Aerospace Applications》（一本关于姿态表示、刚体运动学和动力学非常好的书籍）</p>
+
+            </div>
+            <hr>
+            <div>
+              <div class="post-metas mb-3">
+                
+                
+                  <div class="post-meta">
+                    <i class="iconfont icon-tags"></i>
+                    
+                      <a class="hover-with-bg" href="/tags/Algorithum/">Algorithum</a>
+                    
+                  </div>
+                
+              </div>
+              
+                <p class="note note-warning">
+                  
+                    本博客所有文章除特别声明外，均采用 <a target="_blank" href="https://creativecommons.org/licenses/by-sa/4.0/deed.zh" rel="nofollow noopener noopener">CC BY-SA 4.0 协议</a> ，转载请注明出处！
+                  
+                </p>
+              
+              
+                <div class="post-prevnext">
+                  <article class="post-prev col-6">
+                    
+                    
+                      <a href="/2021/12/10/%E9%9D%9E%E7%BA%BF%E6%80%A7%E8%A7%84%E5%88%92%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0_An_Overveiw/">
+                        <i class="iconfont icon-arrowleft"></i>
+                        <span class="hidden-mobile">非线性规划学习笔记：An Overview</span>
+                        <span class="visible-mobile">Previous</span>
+                      </a>
+                    
+                  </article>
+                  <article class="post-next col-6">
+                    
+                    
+                      <a href="/2021/12/04/%E6%B7%B1%E7%A9%BA%E5%90%8E%E6%9C%9F%E5%A4%84%E7%90%86%E6%B5%81%E7%A8%8B/">
+                        <span class="hidden-mobile">我的深空摄影后期处理流程</span>
+                        <span class="visible-mobile">Next</span>
+                        <i class="iconfont icon-arrowright"></i>
+                      </a>
+                    
+                  </article>
+                </div>
+              
+            </div>
+
+            
+          </article>
+        </div>
+      </div>
+    </div>
+    
+      <div class="d-none d-lg-block col-lg-2 toc-container" id="toc-ctn">
+        <div id="toc">
+  <p class="toc-header"><i class="iconfont icon-list"></i>&nbsp;TOC</p>
+  <div class="toc-body" id="toc-body"></div>
+</div>
+
+      </div>
+    
+  </div>
+</div>
+
+<!-- Custom -->
+
+
+    
+
+    
+      <a id="scroll-top-button" aria-label="TOP" href="#" role="button">
+        <i class="iconfont icon-arrowup" aria-hidden="true"></i>
+      </a>
+    
+
+    
+      <div class="modal fade" id="modalSearch" tabindex="-1" role="dialog" aria-labelledby="ModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-dialog-scrollable modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header text-center">
+        <h4 class="modal-title w-100 font-weight-bold">Search</h4>
+        <button type="button" id="local-search-close" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body mx-3">
+        <div class="md-form mb-5">
+          <input type="text" id="local-search-input" class="form-control validate">
+          <label data-error="x" data-success="v"
+                 for="local-search-input">keyword</label>
+        </div>
+        <div class="list-group" id="local-search-result"></div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+
+    
+  </main>
+
+  <footer class="text-center mt-5 py-3">
+  <div class="footer-content">
+     <a href="https://hexo.io" target="_blank" rel="nofollow noopener"><span>Hexo</span></a> <i class="iconfont icon-love"></i> <a href="https://github.com/fluid-dev/hexo-theme-fluid" target="_blank" rel="nofollow noopener"><span>Fluid</span></a> 
+  </div>
+  
+
+  
+
+  
+</footer>
+
+
+  <!-- SCRIPTS -->
+  
+  <script  src="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.js" ></script>
+  <link  rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0/nprogress.min.css" />
+
+  <script>
+    NProgress.configure({"showSpinner":false,"trickleSpeed":100})
+    NProgress.start()
+    window.addEventListener('load', function() {
+      NProgress.done();
+    })
+  </script>
+
+
+<script  src="https://cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js" ></script>
+<script  src="https://cdn.jsdelivr.net/npm/bootstrap@4/dist/js/bootstrap.min.js" ></script>
+<script  src="/js/events.js" ></script>
+<script  src="/js/plugins.js" ></script>
+
+<!-- Plugins -->
+
+
+  <script  src="/js/local-search.js" ></script>
+
+
+
+  
+    <script  src="/js/img-lazyload.js" ></script>
+  
+
+
+
+  
+
+
+
+  
+    <script  src="https://cdn.jsdelivr.net/npm/tocbot@4/dist/tocbot.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3/dist/jquery.fancybox.min.js" ></script>
+  
+  
+    <script  src="https://cdn.jsdelivr.net/npm/anchor-js@4/anchor.min.js" ></script>
+  
+  
+    <script defer src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js" ></script>
+  
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+    <!-- MathJax -->
+    <script>
+      MathJax = {
+        tex: {
+          inlineMath: [['$', '$'], ['\\(', '\\)']]
+        },
+        loader: {
+          load: ['ui/lazy']
+        },
+        options: {
+          renderActions: {
+            findScript: [10, doc => {
+              document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+                const display = !!node.type.match(/; *mode=display/);
+                const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+                const text = document.createTextNode('');
+                node.parentNode.replaceChild(text, node);
+                math.start = { node: text, delim: '', n: 0 };
+                math.end = { node: text, delim: '', n: 0 };
+                doc.math.push(math);
+              });
+            }, '', false],
+            insertedScript: [200, () => {
+              document.querySelectorAll('mjx-container').forEach(node => {
+                let target = node.parentNode;
+                if (target.nodeName.toLowerCase() === 'li') {
+                  target.parentNode.classList.add('has-jax');
+                }
+              });
+            }, '', false]
+          }
+        }
+      };
+    </script>
+
+    <script async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js" ></script>
+
+  
+
+
+
+
+
+
+
+
+
+
+
+<!-- 主题的启动项 保持在最底部 -->
+<script  src="/js/boot.js" ></script>
+
+
+</body>
+</html>
